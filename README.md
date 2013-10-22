@@ -1,6 +1,6 @@
-# carousel.js
+# Carousel.js
 
-[![Build Status](https://secure.travis-ci.org/user/carousel.js.png?branch=master)](http://travis-ci.org/user/carousel.js)
+[![Build Status](https://secure.travis-ci.org/ndaversa/carousel.js.png?branch=master)](http://travis-ci.org/ndaversa/carousel.js)
 
 
 ## Installation
@@ -16,7 +16,7 @@ The component can be used as a Common JS module, an AMD module, or a global.
 
 ## API
 
-### carousel.js()
+### Carousel.js()
 
 
 ## Testing
