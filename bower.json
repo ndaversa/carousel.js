@@ -1,0 +1,18 @@
+{
+  "name": "carousel.js",
+  "description": "",
+  "version": "0.0.0",
+  "main": "carousel.js",
+  "ignore": [
+    "test",
+    ".jshintrc",
+    ".travis.yml",
+    "CHANGELOG.md",
+    "karma.conf.js",
+    "package.json"
+  ],
+  "devDependencies": {
+    "chai": "*",
+    "lodash": "~2.2.1"
+  }
+}
