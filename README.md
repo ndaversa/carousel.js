@@ -2,23 +2,6 @@
 
 [![Build Status](https://secure.travis-ci.org/ndaversa/carousel.js.png?branch=master)](http://travis-ci.org/ndaversa/carousel.js)
 
-
-## Installation
-
-Install with [Bower](http://bower.io):
-
-```
-bower install --save carousel.js
-```
-
-The component can be used as a Common JS module, an AMD module, or a global.
-
-
-## API
-
-### Carousel.js()
-
-
 ## Testing
 
 Install [Node](http://nodejs.org) (comes with npm) and Bower.
@@ -45,11 +28,7 @@ To run the tests in Firefox, just once, as CI would:
 npm test
 ```
 
-
 ## Browser support
 
 * Google Chrome (latest)
-* Opera (latest)
-* Firefox 4+
-* Safari 5+
-* Internet Explorer 8+
+* More TBD
