@@ -1,4 +1,7 @@
-/*! Carousel.js v0.0.1 - MIT license */
+/*!
+ * Carousel.js v1.0.0 ~ Copyright (c) 2013 Nino D'Aversa, http://ndaversa.com
+ * Released under MIT license
+ */
 
 ;(function (global) { function moduleDefinition(_) {
 
@@ -14,35 +17,34 @@
 
 function Carousel(options) {
   var carouselDefaults = {
-    loop: true
+    loop: true,
+    bufferPages: 2
   };
-
   options || (options = {});
-
   _.extend(this, carouselDefaults, _.pick(options, carouselOptions));
+
+  this.el = typeof this.el == 'string' ? document.querySelector(this.el) : this.el;
 }
 
-var carouselOptions = ['pageWidth', 'loop'];
+var carouselOptions = ['pageWidth', 'loop', 'el', 'bufferPages'];
 
 _.extend(Carousel.prototype, {
 
+  render: function () {
+    this.el.style.overflow = 'hidden';
+    this.el.style.position = 'relative';
+    return this;
+  }
 });
-
-/**
- * Expose carousel
- */
 
 return Carousel;
 
 // ---------------------------------------------------------------------------
 
 } if (typeof exports === 'object') {
-    // node export
     module.exports = moduleDefinition(require('lodash'));
 } else if (typeof define === 'function' && define.amd) {
-    // amd anonymous module registration
     define([require('lodash')], moduleDefinition);
 } else {
-    // browser global
     global.Carousel = moduleDefinition(global._);
 }}(this));
