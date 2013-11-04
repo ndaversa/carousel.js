@@ -1,5 +1,22 @@
 var expect = chai.expect;
 
+function pick (obj, props) {
+  var _props = _.clone(props),
+    rc;
+
+  if (_props.indexOf('transform') >= 0) {
+    _props.push('webkitTransform');
+  }
+
+  rc = _.pick(obj, _props);
+  if (rc.webkitTransform) {
+    rc.transform = rc.webkitTransform;
+    delete rc.webkitTransform;
+  }
+
+  return rc;
+}
+
 describe('Carousel', function () {
   it('can be instantiated', function () {
     var carousel = new Carousel();
@@ -42,6 +59,7 @@ describe('Carousel', function () {
       });
 
       expect(carousel.el.id).to.equal('test');
+      $('#test').remove();
     });
 
     it('accepts a selector as an option', function () {
@@ -51,6 +69,7 @@ describe('Carousel', function () {
       });
 
       expect(carousel.el.id).to.equal('test');
+      $('#test').remove();
     });
   });
 
@@ -74,14 +93,28 @@ describe('Carousel', function () {
     });
 
     it('correctly renders after instantiation', function () {
-      var styleProperites = ['overflow', 'position'];
-      var styles = _.pick(carousel.el.style, styleProperites);
+      var parentProps = ['overflow', 'position'],
+        sliderProps = ['top', 'height', 'width', 'transitionDuration', 'transitionTimingFunction', 'transform'],
+        styles;
 
       carousel.render();
+
+      styles = pick(carousel.el.style, parentProps);
       expect(styles).to.deep.equal({
         overflow: 'hidden',
         position: 'relative'
       });
+
+      styles = pick(carousel.$el.children().first()[0].style, sliderProps);
+      expect(styles).to.deep.equal({
+        top: '0px',
+        height: '100%',
+        width: '100%',
+        transitionDuration: '0s',
+        transitionTimingFunction: 'ease-out',
+        transform: 'translate3d(0px, 0px, 0px)'
+      });
     });
+
   });
 })

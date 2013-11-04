@@ -10,64 +10,14 @@
 // Browser and Feature Detection
 
 var dummyStyle = document.createElement('div').style,
-  vendor = (function () {
-    var vendors = 't,webkitT,MozT,msT,OT'.split(','),
-      t,
-      i = 0,
-      l = vendors.length;
-
-    for ( ; i < l; i++ ) {
-      t = vendors[i] + 'ransform';
-      if ( t in dummyStyle ) {
-        return vendors[i].substr(0, vendors[i].length - 1);
-      }
-    }
-
-    return false;
-  })(),
-  cssVendor = vendor ? '-' + vendor.toLowerCase() + '-' : '',
-
-  // Style properties
-  transform = prefixStyle('transform'),
-  transitionDuration = prefixStyle('transitionDuration'),
-
-  // Browser capabilities
-  has3d = prefixStyle('perspective') in dummyStyle,
   hasTouch = 'ontouchstart' in window,
-  hasTransform = !!vendor,
-  hasTransitionEnd = prefixStyle('transition') in dummyStyle,
-
-  // Helpers
-  translateZ = has3d ? ' translateZ(0)' : '',
 
   // Events
   resizeEvent = 'onorientationchange' in window ? 'orientationchange' : 'resize',
   startEvent = hasTouch ? 'touchstart' : 'mousedown',
   moveEvent = hasTouch ? 'touchmove' : 'mousemove',
   endEvent = hasTouch ? 'touchend' : 'mouseup',
-  cancelEvent = hasTouch ? 'touchcancel' : 'mouseup',
-  transitionEndEvent = (function () {
-    if ( vendor === false ) return false;
-
-    var transitionEnd = {
-      '': 'transitionend',
-      'webkit': 'webkitTransitionEnd',
-      'Moz': 'transitionend',
-      'O': 'oTransitionEnd',
-      'ms': 'MSTransitionEnd'
-    };
-
-    return transitionEnd[vendor];
-  })();
-
-function prefixStyle (style) {
-  if ( vendor === '' ) return style;
-
-  style = style.charAt(0).toUpperCase() + style.substr(1);
-  return vendor + style;
-}
-
-
+  cancelEvent = hasTouch ? 'touchcancel' : 'mouseup';
 
 // ---------------------------------------------------------------------------
 // Carousel.js
@@ -99,13 +49,13 @@ _.extend(Carousel.prototype, {
       width: '100%',
       transitionDuration: '0s',
       transitionTimingFunction: 'ease-out',
-      transform: 'translateZ(0)'
+      transform: 'translate3d(0px, 0px, 0px)'
     });
 
     this.$el.css({
       position: 'relative',
       overflow: 'hidden'
-    }).append(slider);
+    }).html(slider);
 
     return this;
   }
