@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Carousel.js Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+</head>
+
+<body>
+  <div id="test" style="height: 400px;"></div>
+
+  <style>
+
+    ul.slider {
+      margin: 0;
+      border: 0;
+      padding: 0;
+      font-size: 0;
+      list-style-type: none;
+      background: grey;
+    }
+
+    ul.slider li {
+      display: inline-block;
+      font-size: 30px;
+      height: 100%;
+    }
+
+    ul.slider li:nth-child(1) { background: green; }
+    ul.slider li:nth-child(2) { background: red; }
+    ul.slider li:nth-child(3) { background: blue; }
+    ul.slider li:nth-child(4) { background: yellow; }
+    ul.slider li:nth-child(5) { background: cyan; }
+
+  </style>
+
+  <script type="text/javascript" src="bower_components/jquery/jquery.js"></script>
+  <script type="text/javascript" src="bower_components/lodash/dist/lodash.js"></script>
+  <script type="text/javascript" src="carousel.js"></script>
+
+  <script type="text/javascript">
+
+    $(function() {
+      var carousel = new Carousel({
+        el: '#test',
+        data: [
+          { content: '0' },
+          { content: '1' },
+          { content: '2' },
+          { content: '3' },
+          { content: '4' },
+          { content: '5' },
+          { content: '6' },
+          { content: '7' },
+          { content: '8' },
+          { content: '9' },
+          { content: '10' },
+        ]
+      });
+      carousel.render();
+    });
+
+  </script>
+</body>
+</html>

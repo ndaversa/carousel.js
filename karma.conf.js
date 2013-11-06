@@ -19,6 +19,8 @@ module.exports = function (config) {
       'bower_components/jquery/jquery.js',
       'bower_components/lodash/dist/lodash.js',
       'bower_components/chai/chai.js',
+      'bower_components/sinon-chai/lib/sinon-chai.js',
+      'bower_components/sinonjs/sinon.js',
       'carousel.js',
       'test/**/*.js'
     ],
@@ -36,7 +38,7 @@ module.exports = function (config) {
     // CLI --browsers Chrome,Firefox,Safari
     browsers: [
       'Chrome',
-      'Firefox'
+      // 'Firefox'
     ],
 
     // if browser does not capture in given timeout [ms], kill it
