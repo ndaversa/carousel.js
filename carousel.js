@@ -194,16 +194,21 @@ _.extend(Carousel.prototype, {
 
   _start: function (evt) {
     this.start.x = evt.originalEvent.touches[0].pageX;
+    this.start.y = evt.originalEvent.touches[0].pageY;
     this.touches = [];
     this.touches.push(this.start.x);
   },
 
   _move: function (evt) {
-    evt.preventDefault(); //needed for Android 2.3
-
     this.move.x = evt.originalEvent.touches[0].pageX;
-    this.touches.push(this.move.x);
+    this.move.y = evt.originalEvent.touches[0].pageY;
     this.delta.x = this.move.x - this.start.x;
+    this.delta.y = this.move.y - this.start.y;
+
+    if (this.delta.y > this.delta.x) return;
+
+    evt.preventDefault(); //needed for Android 2.3
+    this.touches.push(this.move.x);
     this.next.x = this.current.x + this.delta.x;
 
     if (this.next.x > this.limit.left.x) { //left-most limit
