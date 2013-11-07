@@ -205,7 +205,7 @@ _.extend(Carousel.prototype, {
     this.delta.x = this.move.x - this.start.x;
     this.delta.y = this.move.y - this.start.y;
 
-    if (this.delta.y > this.delta.x) return;
+    if (Math.abs(this.delta.y) > Math.abs(this.delta.x)) return;
 
     evt.preventDefault(); //needed for Android 2.3
     this.touches.push(this.move.x);
