@@ -18,7 +18,7 @@ function pick (obj, props) {
 }
 
 function makeTouchEvent (x) {
-  return { originalEvent: { touches: [ { pageX: x} ] } };
+  return { originalEvent: { touches: [ { pageX: x} ] }, preventDefault: function () {} };
 }
 
 function triggerTouches (obj, touches) {
