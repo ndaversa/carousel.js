@@ -30,6 +30,7 @@ function Carousel(options) {
   this.delta = {x: 0, page: 0};
   this.next = {x: 0, page:0};
   this.current = {x: 0, page:0};
+  this.limit = {left: {x: 0}, right: {x:0}};
 
   this._configure(options);
   this.$el = $(this.el);
@@ -57,11 +58,14 @@ _.extend(Carousel.prototype, {
     };
     _.extend(this, carouselDefaults, _.pick(options, carouselOptions));
     if (!this.loop) {
-      this.current.page = 0;
+      this.limit.left.x = 0;
+      this.limit.right.x = (this.data.length - 1) * -this.pageWidth;
     }
     else {
-      this.current.page = this.bufferPages;
+      this.limit.left.x = Infinity;
+      this.limit.right.x = -Infinity;
     }
+    this.current.page = this.bufferPages;
   },
 
   pageTemplate: function (data) {
@@ -77,34 +81,35 @@ _.extend(Carousel.prototype, {
   initPages: function () {
     var dataIndex = this.data.length - 1;
 
-    if (this.loop) {
-      this.page = new Array(this.bufferPages * 2 + 1);
-      this.offset = this.bufferPages;
+    this.page = new Array(this.bufferPages * 2 + 1);
 
-      for (var i=this.current.page-1; i>=0; i--) {
-        var data = this.data[dataIndex-- % this.data.length],
-          x = (i - this.offset) * this.pageWidth;
+    // Build left buffer pages
+    for (var i=this.current.page-1; i>=0; i--) {
+      var data = this.loop ? this.data[dataIndex-- % this.data.length] : undefined,
+        x = (i - this.bufferPages) * this.pageWidth;
 
-        this.page[i] = {
-          x: x,
-          dataIndex: dataIndex + 1,
-          data: data,
-          $el: $(this.pageTemplate(data)).css({
-            position: 'absolute',
-            left: x + 'px'
-          })
-        };
-      }
-    }
-    else {
-      this.page = new Array(Math.min(this.bufferPages * 2 + 1, this.data.length));
-      this.offset = 0;
+      this.page[i] = {
+        x: x,
+        dataIndex: dataIndex + 1,
+        data: data,
+        $el: $(this.pageTemplate(data)).css({
+          position: 'absolute',
+          left: x + 'px'
+        })
+      };
     }
 
     dataIndex = 0;
     for (var i=this.current.page; i<this.page.length; i++) {
-      var data = this.data[dataIndex++ % this.data.length],
-        x = (i - this.offset) * this.pageWidth;
+      var data,
+        x = (i - this.bufferPages) * this.pageWidth;
+
+      if (!this.loop && dataIndex > this.data.length - 1) {
+        data = undefined;
+      }
+      else {
+        data = this.data[dataIndex++ % this.data.length];
+      }
 
       this.page[i] = {
         x: x,
@@ -159,27 +164,30 @@ _.extend(Carousel.prototype, {
   },
 
   crossBoundary: function (previous, current) {
-    var rightMostPage = this.indexShift(this.current.page, this.bufferPages, this.page.length),
-      leftMostPage = this.indexShift(this.current.page, -this.bufferPages, this.page.length),
-      nextRightData = this.indexShift(this.page[rightMostPage].dataIndex, 1, this.data.length),
-      nextLeftData = this.indexShift(this.page[leftMostPage].dataIndex, -1, this.data.length);
+    var rightMostPage = _.max(this.page, function(page) { return page.x; }),
+        leftMostPage  = _.min(this.page, function(page) { return page.x; }),
+        nextRightData = this.indexShift(rightMostPage.dataIndex, 1, this.data.length),
+        nextLeftData  = this.indexShift(leftMostPage.dataIndex, -1, this.data.length);
 
     if (previous < current) { //swiped to the left (show more on right)
-      this.page[leftMostPage].data = this.data[nextRightData];
-      this.page[leftMostPage].dataIndex = nextRightData;
-      this.page[leftMostPage].x = this.page[rightMostPage].x + this.pageWidth;
-      this.page[leftMostPage].$el
-        .css('left', this.page[leftMostPage].x + 'px')
-        .html(this.template(this.page[leftMostPage].data));
+      if (this.loop || nextRightData !== 0) {
+        leftMostPage.data = this.data[nextRightData];
+        leftMostPage.dataIndex = nextRightData;
+        leftMostPage.x = rightMostPage.x + this.pageWidth;
+        leftMostPage.$el
+          .css('left', leftMostPage.x + 'px')
+          .html(this.template(leftMostPage.data));
+      }
     }
     else { //swiped to the right (show more on left)
-      //take the right-most page and move it to the left-most
-      this.page[rightMostPage].data = this.data[nextLeftData];
-      this.page[rightMostPage].dataIndex = nextLeftData;
-      this.page[rightMostPage].x = this.page[leftMostPage].x - this.pageWidth;
-      this.page[rightMostPage].$el
-        .css('left', this.page[rightMostPage].x + 'px')
-        .html(this.template(this.page[rightMostPage].data));
+      if (this.loop || nextLeftData !== this.data.length - 1) {
+        rightMostPage.data = this.data[nextLeftData];
+        rightMostPage.dataIndex = nextLeftData;
+        rightMostPage.x = leftMostPage.x - this.pageWidth;
+        rightMostPage.$el
+          .css('left', rightMostPage.x + 'px')
+          .html(this.template(rightMostPage.data));
+      }
     }
     this.current.page = current;
   },
@@ -188,25 +196,52 @@ _.extend(Carousel.prototype, {
     this.start.x = evt.originalEvent.touches[0].pageX;
     this.touches = [];
     this.touches.push(this.start.x);
-    console.log('start.x', this.start.x);
   },
 
   _move: function (evt) {
     this.move.x = evt.originalEvent.touches[0].pageX;
     this.touches.push(this.move.x);
-    console.log('move.x', this.move.x);
     this.delta.x = this.move.x - this.start.x;
     this.next.x = this.current.x + this.delta.x;
+
+    if (this.next.x > this.limit.left.x) { //left-most limit
+      this.next.x -= Math.round(this.delta.x/2);
+    }
+    else if (this.next.x < this.limit.right.x) { //right-most limit
+      this.delta.bounce = this.limit.right.x - this.next.x;
+      this.next.x = this.limit.right.x - Math.round(this.delta.bounce/2);
+    }
+
     this.slider.css({
-      transform: 'translate3d(' + this.next.x + 'px, 0, 0)'
+      transform: 'translate3d(' + this.next.x + 'px, 0, 0)',
+      transition: '0s'
     });
   },
 
   _end: function (evt) {
-    console.log('end', this.touches);
+    var animateBack = false;
+
+    // console.log('_end, touches', this.touches);
     this.touches = [];
+
+    if (this.next.x > this.limit.left.x) { //left-most limit
+      this.next.x = this.limit.left.x;
+      animateBack = true;
+    }
+    else if (this.next.x < this.limit.right.x) { //right-most limit
+      this.next.x = this.limit.right.x;
+      animateBack = true;
+    }
+
+    if (animateBack) {
+      this.slider.css({
+        transform: 'translate3d(' + this.next.x + 'px, 0, 0)',
+        transition: '300ms'
+      });
+    }
+
     this.current.x = this.next.x;
-    this.next.page = Math.floor(-this.current.x / this.pageWidth) + this.offset;
+    this.next.page = Math.floor(-this.current.x / this.pageWidth) + this.bufferPages;
     if (this.current.page !== this.next.page) {
       this.crossBoundary(this.current.page, this.next.page);
     }

@@ -49,6 +49,14 @@ describe('Carousel', function () {
       { content: '2' },
       { content: '3' },
     ],
+    six = [
+      { content: '0' },
+      { content: '1' },
+      { content: '2' },
+      { content: '3' },
+      { content: '4' },
+      { content: '5' },
+    ],
     eleven = [
       { content: '0' },
       { content: '1' },
@@ -270,20 +278,20 @@ describe('Carousel', function () {
           data: eleven
         });
         carousel.render();
-        expect(carousel.current.page).to.equal(0);
+        expect(carousel.current.page).to.equal(2);
         expect(carousel.page.length).to.equal(5);
 
-        expect(carousel.page[0].data).to.deep.equal({ content: '0' });
-        expect(carousel.page[1].data).to.deep.equal({ content: '1' });
-        expect(carousel.page[2].data).to.deep.equal({ content: '2' });
-        expect(carousel.page[3].data).to.deep.equal({ content: '3' });
-        expect(carousel.page[4].data).to.deep.equal({ content: '4' });
+        expect(carousel.page[0].data).to.deep.equal(undefined);
+        expect(carousel.page[1].data).to.deep.equal(undefined);
+        expect(carousel.page[2].data).to.deep.equal({ content: '0' });
+        expect(carousel.page[3].data).to.deep.equal({ content: '1' });
+        expect(carousel.page[4].data).to.deep.equal({ content: '2' });
 
-        expect(carousel.page[0].x).to.equal(0);
-        expect(carousel.page[1].x).to.equal(256);
-        expect(carousel.page[2].x).to.equal(512);
-        expect(carousel.page[3].x).to.equal(768);
-        expect(carousel.page[4].x).to.equal(1024);
+        expect(carousel.page[0].x).to.equal(-512);
+        expect(carousel.page[1].x).to.equal(-256);
+        expect(carousel.page[2].x).to.equal(0);
+        expect(carousel.page[3].x).to.equal(256);
+        expect(carousel.page[4].x).to.equal(512);
       });
 
       it('handles data.length < page.length', function () {
@@ -293,13 +301,19 @@ describe('Carousel', function () {
           data: two
         });
         carousel.render();
-        expect(carousel.current.page).to.equal(0);
-        expect(carousel.page.length).to.equal(2);
-        expect(carousel.page[0].data).to.deep.equal({ content: '0' });
-        expect(carousel.page[1].data).to.deep.equal({ content: '1' });
+        expect(carousel.current.page).to.equal(2);
+        expect(carousel.page.length).to.equal(5);
+        expect(carousel.page[0].data).to.deep.equal(undefined);
+        expect(carousel.page[1].data).to.deep.equal(undefined);
+        expect(carousel.page[2].data).to.deep.equal({ content: '0' });
+        expect(carousel.page[3].data).to.deep.equal({ content: '1' });
+        expect(carousel.page[4].data).to.deep.equal(undefined);
 
-        expect(carousel.page[0].x).to.equal(0);
-        expect(carousel.page[1].x).to.equal(256);
+        expect(carousel.page[0].x).to.equal(-512);
+        expect(carousel.page[1].x).to.equal(-256);
+        expect(carousel.page[2].x).to.equal(0);
+        expect(carousel.page[3].x).to.equal(256);
+        expect(carousel.page[4].x).to.equal(512);
       });
 
       it('handles data.length one less then page.length', function () {
@@ -309,17 +323,20 @@ describe('Carousel', function () {
           data: four
         });
         carousel.render();
-        expect(carousel.current.page).to.equal(0);
-        expect(carousel.page.length).to.equal(4);
-        expect(carousel.page[0].data).to.deep.equal({ content: '0' });
-        expect(carousel.page[1].data).to.deep.equal({ content: '1' });
-        expect(carousel.page[2].data).to.deep.equal({ content: '2' });
-        expect(carousel.page[3].data).to.deep.equal({ content: '3' });
+        expect(carousel.current.page).to.equal(2);
+        expect(carousel.page.length).to.equal(5);
 
-        expect(carousel.page[0].x).to.equal(0);
-        expect(carousel.page[1].x).to.equal(256);
-        expect(carousel.page[2].x).to.equal(512);
-        expect(carousel.page[3].x).to.equal(768);
+        expect(carousel.page[0].data).to.deep.equal(undefined);
+        expect(carousel.page[1].data).to.deep.equal(undefined);
+        expect(carousel.page[2].data).to.deep.equal({ content: '0' });
+        expect(carousel.page[3].data).to.deep.equal({ content: '1' });
+        expect(carousel.page[4].data).to.deep.equal({ content: '2' });
+
+        expect(carousel.page[0].x).to.equal(-512);
+        expect(carousel.page[1].x).to.equal(-256);
+        expect(carousel.page[2].x).to.equal(0);
+        expect(carousel.page[3].x).to.equal(256);
+        expect(carousel.page[4].x).to.equal(512);
       });
 
       it('handles data.length = 1', function () {
@@ -329,10 +346,20 @@ describe('Carousel', function () {
           data: one
         });
         carousel.render();
-        expect(carousel.current.page).to.equal(0);
-        expect(carousel.page.length).to.equal(1);
-        expect(carousel.page[0].data).to.deep.equal({ content: '0' });
-        expect(carousel.page[0].x).to.equal(0);
+        expect(carousel.current.page).to.equal(2);
+        expect(carousel.page.length).to.equal(5);
+
+        expect(carousel.page[0].data).to.deep.equal(undefined);
+        expect(carousel.page[1].data).to.deep.equal(undefined);
+        expect(carousel.page[2].data).to.deep.equal({ content: '0' });
+        expect(carousel.page[3].data).to.deep.equal(undefined);
+        expect(carousel.page[3].data).to.deep.equal(undefined);
+
+        expect(carousel.page[0].x).to.equal(-512);
+        expect(carousel.page[1].x).to.equal(-256);
+        expect(carousel.page[2].x).to.equal(0);
+        expect(carousel.page[3].x).to.equal(256);
+        expect(carousel.page[4].x).to.equal(512);
       });
     });
   }); //describe initial layout
@@ -421,6 +448,69 @@ describe('Carousel', function () {
       });
     });
     describe('when not looping', function () {
+      describe('when swiping to the left (show more on the right)', function () {
+
+        beforeEach(function () {
+          el = $('<div id="test" style="width: 320px;" />');
+          el.appendTo('body');
+          carousel = new Carousel({
+            el: '#test',
+            loop: false,
+            data: two
+          });
+          carousel.render();
+        });
+
+        afterEach(function () {
+          el.remove();
+        });
+
+        it('does not load data after the largest index (prevents wrapping)', function () {
+          sinon.spy(carousel, "crossBoundary");
+          triggerTouches(carousel, [297, 297, 293, 286, 271, 228, 192, 159, 124, 94, 72, 56, 42, 29, 22, 17, 14, 13]);
+          expect(carousel.current.page).to.equal(3);
+
+          expect(carousel.page[0].data).to.deep.equal(undefined);
+          expect(carousel.page[1].data).to.deep.equal(undefined);
+          expect(carousel.page[2].data).to.deep.equal({ content: '0' });
+          expect(carousel.page[3].data).to.deep.equal({ content: '1' });
+          expect(carousel.page[4].data).to.deep.equal(undefined);
+
+          expect(carousel.page[0].x).to.equal(-512);
+          expect(carousel.page[1].x).to.equal(-256);
+          expect(carousel.page[2].x).to.equal(0);
+          expect(carousel.page[3].x).to.equal(256);
+          expect(carousel.page[4].x).to.equal(512);
+        });
+      });
+      describe('when swiping to the right (show more on the left)', function () {
+
+        beforeEach(function () {
+          el = $('<div id="test" style="width: 320px;" />');
+          el.appendTo('body');
+          carousel = new Carousel({
+            el: '#test',
+            loop: false,
+            data: six
+          });
+          carousel.render();
+        });
+
+        afterEach(function () {
+          el.remove();
+        });
+
+        it('has the correct state at the right bound when data.length > page.length', function () {
+          sinon.spy(carousel, "crossBoundary");
+          triggerTouches(carousel, [303, 302, 298, 288, 247, 191, 149, 85, 54, 48, 38, 33, 27, 24] );
+          triggerTouches(carousel, [305, 303, 300, 291, 282, 254, 173, 137, 118, 112, 100, 90, 82, 73, 64, 56, 50, 48, 48, 44, 36, 31, 27, 26, 24, 22]);
+          triggerTouches(carousel, [296, 295, 288, 276, 240, 200, 182, 140, 106, 84, 61, 50, 39, 31, 29, 29, 28]);
+          triggerTouches(carousel, [302, 301, 293, 284, 270, 255, 229, 206, 196, 168, 151, 135, 117, 101, 89, 81, 78, 76, 75, 73, 72]);
+          triggerTouches(carousel, [304, 303, 301, 282, 214, 174, 157, 142, 126, 113, 102, 94, 89, 87, 85, 84, 83, 81, 79, 75, 73, 69, 67, 65, 65, 64]);
+          expect(carousel.crossBoundary.callCount).to.equal(5);
+          expect(carousel.current.page).to.equal(7);
+        });
+      });
     });
   });
 })
