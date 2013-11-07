@@ -509,6 +509,18 @@ describe('Carousel', function () {
           triggerTouches(carousel, [304, 303, 301, 282, 214, 174, 157, 142, 126, 113, 102, 94, 89, 87, 85, 84, 83, 81, 79, 75, 73, 69, 67, 65, 65, 64]);
           expect(carousel.crossBoundary.callCount).to.equal(5);
           expect(carousel.current.page).to.equal(7);
+
+          expect(carousel.page[0].data).to.deep.equal({ content: '3' });
+          expect(carousel.page[1].data).to.deep.equal({ content: '4' });
+          expect(carousel.page[2].data).to.deep.equal({ content: '5' });
+          expect(carousel.page[3].data).to.deep.equal({ content: '1' });
+          expect(carousel.page[4].data).to.deep.equal({ content: '2' });
+
+          expect(carousel.page[0].x).to.equal(768);
+          expect(carousel.page[1].x).to.equal(1024);
+          expect(carousel.page[2].x).to.equal(1280);
+          expect(carousel.page[3].x).to.equal(256);
+          expect(carousel.page[4].x).to.equal(512);
         });
       });
     });

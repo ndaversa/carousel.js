@@ -199,6 +199,8 @@ _.extend(Carousel.prototype, {
   },
 
   _move: function (evt) {
+    evt.preventDefault(); //needed for Android 2.3
+
     this.move.x = evt.originalEvent.touches[0].pageX;
     this.touches.push(this.move.x);
     this.delta.x = this.move.x - this.start.x;
@@ -248,8 +250,7 @@ _.extend(Carousel.prototype, {
   },
 
   _cancel: function (evt) {
-    console.log('CANCEL');
-    //TODO: how to treat this? same as _end or rollback interaction?
+    this._end(evt);
   }
 
 });
