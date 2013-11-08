@@ -20,7 +20,6 @@
     }
 
     ul.slider li {
-      display: inline-block;
       font-size: 30px;
       height: 100%;
     }
@@ -30,6 +29,15 @@
     ul.slider li:nth-child(3) { background: blue; }
     ul.slider li:nth-child(4) { background: yellow; }
     ul.slider li:nth-child(5) { background: cyan; }
+    ul.slider li:nth-child(6) { background: magenta; }
+    ul.slider li:nth-child(7) { background: orange; }
+    ul.slider li:nth-child(8) { background: blue; }
+    ul.slider li:nth-child(9) { background: yellow; }
+    ul.slider li:nth-child(10) { background: cyan; }
+    ul.slider li:nth-child(11) { background: magenta; }
+    ul.slider li:nth-child(12) { background: orange; }
+    ul.slider li:nth-child(13) { background: green; }
+    ul.slider li:nth-child(14) { background: red; }
 
   </style>
 
@@ -42,6 +50,7 @@
     $(function() {
       var carousel = new Carousel({
         el: '#test',
+        bufferPages: 4,
         data: [
           { content: '0' },
           { content: '1' },

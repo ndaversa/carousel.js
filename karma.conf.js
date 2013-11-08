@@ -16,6 +16,7 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
+      {pattern: 'demo.html', included: false, watched: false}, //demo can be accessed at http://localhost:9876/base/demo.html
       'bower_components/jquery/jquery.js',
       'bower_components/lodash/dist/lodash.js',
       'bower_components/chai/chai.js',

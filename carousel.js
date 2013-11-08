@@ -38,6 +38,7 @@ function Carousel(options) {
 }
 
 var carouselOptions = [
+  'animationDuration',
   'bufferPages',
   'data',
   'el',
@@ -54,9 +55,11 @@ _.extend(Carousel.prototype, {
       loop: true,
       data: [],
       bufferPages: 2,
-      pageWidth: 256
+      pageWidth: 256,
+      animationDuration: 0.325
     };
     _.extend(this, carouselDefaults, _.pick(options, carouselOptions));
+    _.bindAll(this, 'crossBoundary', '_start', '_move', '_end', '_transitionEnd');
     if (!this.loop) {
       this.limit.left.x = 0;
       this.limit.right.x = (this.data.length - 1) * -this.pageWidth;
@@ -131,7 +134,7 @@ _.extend(Carousel.prototype, {
       height: '100%',
       width: '100%',
       transitionDuration: '0s',
-      transitionTimingFunction: 'ease-out',
+      transitionTimingFunction: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
       transform: 'translate3d(0px, 0px, 0px)'
     })
     .on('touchstart', _.bind(this._start, this))
@@ -166,28 +169,35 @@ _.extend(Carousel.prototype, {
   crossBoundary: function (previous, current) {
     var rightMostPage = _.max(this.page, function(page) { return page.x; }),
         leftMostPage  = _.min(this.page, function(page) { return page.x; }),
+        currentData   = this.indexShift(leftMostPage.dataIndex, this.bufferPages, this.data.length),
         nextRightData = this.indexShift(rightMostPage.dataIndex, 1, this.data.length),
         nextLeftData  = this.indexShift(leftMostPage.dataIndex, -1, this.data.length);
 
     if (previous < current) { //swiped to the left (show more on right)
-      if (this.loop || nextRightData !== 0) {
+      if (this.loop || nextRightData > currentData) {
         leftMostPage.data = this.data[nextRightData];
-        leftMostPage.dataIndex = nextRightData;
-        leftMostPage.x = rightMostPage.x + this.pageWidth;
-        leftMostPage.$el
-          .css('left', leftMostPage.x + 'px')
-          .html(this.template(leftMostPage.data));
       }
+      else {
+        leftMostPage.data = undefined;
+      }
+      leftMostPage.dataIndex = nextRightData;
+      leftMostPage.x = rightMostPage.x + this.pageWidth;
+      leftMostPage.$el
+        .css('left', leftMostPage.x + 'px')
+        .html(this.template(leftMostPage.data));
     }
     else { //swiped to the right (show more on left)
-      if (this.loop || nextLeftData !== this.data.length - 1) {
+      if (this.loop || nextLeftData < currentData) {
         rightMostPage.data = this.data[nextLeftData];
-        rightMostPage.dataIndex = nextLeftData;
-        rightMostPage.x = leftMostPage.x - this.pageWidth;
-        rightMostPage.$el
-          .css('left', rightMostPage.x + 'px')
-          .html(this.template(rightMostPage.data));
       }
+      else {
+        rightMostPage.data = undefined;
+      }
+      rightMostPage.dataIndex = nextLeftData;
+      rightMostPage.x = leftMostPage.x - this.pageWidth;
+      rightMostPage.$el
+        .css('left', rightMostPage.x + 'px')
+        .html(this.template(rightMostPage.data));
     }
     this.current.page = current;
   },
@@ -195,20 +205,24 @@ _.extend(Carousel.prototype, {
   _start: function (evt) {
     this.start.x = evt.originalEvent.touches[0].pageX;
     this.start.y = evt.originalEvent.touches[0].pageY;
+    this.start.timeStamp = evt.originalEvent.timeStamp;
     this.touches = [];
-    this.touches.push(this.start.x);
+    this.touches.push(this.start);
   },
 
   _move: function (evt) {
     this.move.x = evt.originalEvent.touches[0].pageX;
     this.move.y = evt.originalEvent.touches[0].pageY;
+    this.move.timeStamp = evt.originalEvent.timeStamp;
     this.delta.x = this.move.x - this.start.x;
     this.delta.y = this.move.y - this.start.y;
 
+    if (this.animating) this._transitionEnd(); //cleanup running animation
+
     if (Math.abs(this.delta.y) > Math.abs(this.delta.x)) return;
 
-    evt.preventDefault(); //needed for Android 2.3
-    this.touches.push(this.move.x);
+    evt.preventDefault(); // needed on Android 2.3 to get more `touchmove` events
+    this.touches.push(_(this.move).clone());
     this.next.x = this.current.x + this.delta.x;
 
     if (this.next.x > this.limit.left.x) { //left-most limit
@@ -221,36 +235,62 @@ _.extend(Carousel.prototype, {
 
     this.slider.css({
       transform: 'translate3d(' + this.next.x + 'px, 0, 0)',
-      transition: '0s'
+      transitionDuration: '0s'
     });
   },
 
   _end: function (evt) {
-    var animateBack = false;
+    var transitionEndEvent = 'webkitTransitionEnd transitionend',
+      d = this.animationDuration,
+      sample = { percentage: 0.25 };
 
-    // console.log('_end, touches', this.touches);
-    this.touches = [];
+    //uncomment below to generate touch events used for simulation during tests
+    // console.log('_end, touches', JSON.stringify(this.touches));
 
-    if (this.next.x > this.limit.left.x) { //left-most limit
+    sample.size = Math.ceil(this.touches.length * sample.percentage);
+
+    if (sample.size > 1) {
+      sample.data = _.last(this.touches, sample.size);
+      sample.first = _.first(sample.data);
+      sample.last = _.last(sample.data);
+      sample.distance = sample.last.x - sample.first.x;
+      sample.time = (sample.last.timeStamp - sample.first.timeStamp) / 1000;
+      sample.velocity = sample.distance / sample.time;
+      sample.position = Math.ceil(sample.velocity * (d - d * d / (2 * d)));
+
+      this.next.x += sample.position;
+    }
+
+    if (this.next.x > this.limit.left.x) {
       this.next.x = this.limit.left.x;
-      animateBack = true;
     }
-    else if (this.next.x < this.limit.right.x) { //right-most limit
+    else if (this.next.x < this.limit.right.x) {
       this.next.x = this.limit.right.x;
-      animateBack = true;
-    }
-
-    if (animateBack) {
-      this.slider.css({
-        transform: 'translate3d(' + this.next.x + 'px, 0, 0)',
-        transition: '300ms'
-      });
     }
 
     this.current.x = this.next.x;
     this.next.page = Math.floor(-this.current.x / this.pageWidth) + this.bufferPages;
-    if (this.current.page !== this.next.page) {
-      this.crossBoundary(this.current.page, this.next.page);
+    this.touches = [];
+
+    this.slider.off(transitionEndEvent)
+    .one(transitionEndEvent, this._transitionEnd)
+    .css({
+      transform: 'translate3d(' + this.next.x + 'px, 0, 0)',
+      transitionDuration: d + 's'
+    });
+    this.animating = true;
+  },
+
+  _transitionEnd: function () {
+    this.animating = false;
+    this.delta.page = Math.abs(this.next.page - this.current.page);
+    for (var i=0; i < this.delta.page; i++) {
+      if (this.next.page > this.current.page) {
+        this.crossBoundary(this.current.page, this.current.page + 1);
+      }
+      else {
+        this.crossBoundary(this.current.page, this.current.page - 1);
+      }
     }
   },
 
