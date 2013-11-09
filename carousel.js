@@ -25,16 +25,15 @@ var dummyStyle = document.createElement('div').style,
 function Carousel(options) {
   options || (options = {});
 
-  this.start = {x: 0, page:0};
-  this.move = {x: 0, page: 0};
-  this.delta = {x: 0, page: 0};
-  this.next = {x: 0, page:0};
+  this.container = {};
   this.current = {x: 0, page:0};
+  this.delta = {x: 0, page: 0};
   this.limit = {left: {x: 0}, right: {x:0}};
+  this.move = {x: 0, page: 0};
+  this.next = {x: 0, page:0};
+  this.start = {x: 0, page:0};
 
   this._configure(options);
-  this.$el = $(this.el);
-  this.el = this.$el[0];
 }
 
 var carouselOptions = [
@@ -54,7 +53,6 @@ _.extend(Carousel.prototype, {
     var carouselDefaults = {
       loop: true,
       data: [],
-      bufferPages: 2,
       pageWidth: 256,
       animationDuration: 0.325
     };
@@ -68,6 +66,13 @@ _.extend(Carousel.prototype, {
       this.limit.left.x = Infinity;
       this.limit.right.x = -Infinity;
     }
+
+    this.$el = $(this.el);
+    this.el = this.$el[0];
+    this.container.width = this.$el.width();
+    this.container.pages = Math.ceil(this.container.width / this.pageWidth);
+    this.bufferPages = this.container.pages;
+
     this.current.page = this.bufferPages;
   },
 

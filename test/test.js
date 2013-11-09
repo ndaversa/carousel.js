@@ -93,27 +93,27 @@ describe('Carousel', function () {
       var carousel = new Carousel();
       var carouselOptions = [
         'loop',
-        'bufferPages'
+        'animationDuration'
       ];
       var pickedOptions = _.pick(carousel, carouselOptions);
 
       expect(pickedOptions).to.deep.equal({
         loop: true,
-        bufferPages: 2
+        animationDuration: 0.325
       });
     });
 
     it('allows defaults to be overridden', function () {
       var carousel = new Carousel({
         loop: false,
-        bufferPages: 4
+        animationDuration: 0.4
       });
-      var carouselOptions = ['loop', 'bufferPages'];
+      var carouselOptions = ['loop', 'animationDuration'];
       var pickedOptions = _.pick(carousel, carouselOptions);
 
       expect(pickedOptions).to.deep.equal({
         loop: false,
-        bufferPages: 4
+        animationDuration: 0.4
       });
     });
 
@@ -562,6 +562,89 @@ describe('Carousel', function () {
       expect(carousel.crossBoundary.getCall(1)).to.have.been.calledWith(3, 4);
       expect(carousel.crossBoundary).to.have.been.calledTwice;
       expect(carousel.current.page).to.equal(4);
+    });
+  });
+
+  describe('bufferPages', function () {
+
+    it('it creates an ideal number of buffer pages for a 320px wide layout', function () {
+      el = $('<div id="test" style="width: 320px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: eleven,
+        pageWidth:128
+      });
+      carousel.render();
+
+      expect(carousel.bufferPages).to.equal(3);
+
+      el.remove();
+    });
+
+    it('it creates an ideal number of buffer pages for a 480px wide layout', function () {
+      el = $('<div id="test" style="width: 480px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: eleven,
+        pageWidth:128
+      });
+      carousel.render();
+
+      expect(carousel.bufferPages).to.equal(4);
+
+      el.remove();
+    });
+
+    it('it creates an ideal number of buffer pages for a 568px wide layout', function () {
+      el = $('<div id="test" style="width: 568px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: eleven,
+        pageWidth:128
+      });
+      carousel.render();
+
+      expect(carousel.bufferPages).to.equal(5);
+
+      el.remove();
+    });
+
+    it('it creates an ideal number of buffer pages for a 768px wide layout', function () {
+      el = $('<div id="test" style="width: 768px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: eleven,
+        pageWidth:128
+      });
+      carousel.render();
+
+      expect(carousel.bufferPages).to.equal(6);
+
+      el.remove();
+    });
+
+    it('it creates an ideal number of buffer pages for a 1024px wide layout', function () {
+      el = $('<div id="test" style="width: 1024px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: eleven,
+        pageWidth:128
+      });
+      carousel.render();
+
+      expect(carousel.bufferPages).to.equal(8);
+
+      el.remove();
     });
   });
 })

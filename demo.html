@@ -6,7 +6,7 @@
 </head>
 
 <body>
-  <div id="test" style="height: 400px;"></div>
+  <div id="test" style="width: 100%; height: 200px;"></div>
 
   <style>
 
@@ -50,7 +50,7 @@
     $(function() {
       var carousel = new Carousel({
         el: '#test',
-        bufferPages: 4,
+        pageWidth: 128,
         data: [
           { content: '0' },
           { content: '1' },
