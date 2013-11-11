@@ -40,6 +40,7 @@ function Carousel(options) {
 var carouselOptions = [
   'animationDuration',
   'data',
+  'delayBuffers',
   'el',
   'loop',
   'pageTemplate',
@@ -51,10 +52,11 @@ _.extend(Carousel.prototype, {
 
   _configure: function (options) {
     var carouselDefaults = {
-      loop: true,
+      animationDuration: 0.325,
       data: [],
+      delayBuffers: false,
+      loop: true,
       pageWidth: 256,
-      animationDuration: 0.325
     };
     _.extend(this, carouselDefaults, _.pick(options, carouselOptions));
     _.bindAll(this, 'crossBoundary', '_start', '_move', '_end', '_transitionEnd');
@@ -69,18 +71,20 @@ _.extend(Carousel.prototype, {
 
     this.$el = $(this.el);
     this.el = this.$el[0];
+    this.slider = $('<ul class="slider"/>');
+
     this.container.width = this.$el.width();
 
-    this.pages.visible = Math.ceil(this.container.width / this.pageWidth);
-    this.pages.side = this.pages.visible;
-    this.pages.total = this.pages.visible * 3;
+    this.pages.side = Math.ceil(this.container.width / this.pageWidth);
+    this.pages.visible = _.range(this.pages.side, 2*this.pages.side);
+    this.pages.total = this.pages.side * 3;
 
-    this.current.page = this.pages.visible;
+    this.current.page = this.pages.side;
+    this.rendered = false;
   },
 
-  pageTemplate: function (data) {
-    data = data || { content: '' };
-    return '<li style="width:' + this.pageWidth + 'px;">' + this.template(data) + '</li>';
+  pageTemplate: function () {
+    return '<li style="width:' + this.pageWidth + 'px;"></li>';
   },
 
   template: function (data) {
@@ -102,7 +106,7 @@ _.extend(Carousel.prototype, {
         x: x,
         dataIndex: dataIndex + 1,
         data: data,
-        $el: $(this.pageTemplate(data)).css({
+        $el: $(this.pageTemplate()).css({
           position: 'absolute',
           left: x + 'px'
         })
@@ -125,7 +129,7 @@ _.extend(Carousel.prototype, {
         x: x,
         dataIndex: dataIndex - 1,
         data: data,
-        $el: $(this.pageTemplate(data)).css({
+        $el: $(this.pageTemplate()).css({
           position: 'absolute',
           left: x + 'px'
         })
@@ -134,7 +138,6 @@ _.extend(Carousel.prototype, {
   },
 
   initSlider: function () {
-    this.slider = $('<ul class="slider"/>');
     this.slider.css({
       position: 'relative',
       top: '0px',
@@ -150,16 +153,42 @@ _.extend(Carousel.prototype, {
     .on('touchcancel', _.bind(this._cancel, this));
   },
 
-  appendPages: function () {
-    for (var i=0; i<this.page.length; i++) {
+  renderPages: function () {
+    _(this.pages.visible).each(function (i) {
+      this.page[i].$el.html(this.template(this.page[i].data));
       this.slider.append(this.page[i].$el);
+    }, this);
+
+    this.renderBuffers(this.delayBuffers);
+  },
+
+  renderBuffers: function (withoutData) {
+    var right = this.current.page + this.pages.visible.length,
+      left = 0;
+
+    for (; right<this.page.length; right++) {
+      if (!withoutData) {
+        this.page[right].$el.html(this.template(this.page[right].data));
+      }
+      this.slider.append(this.page[right].$el);
+    }
+
+    for (; left<this.current.page; left++) {
+      if (!withoutData) {
+        this.page[left].$el.html(this.template(this.page[left].data));
+      }
+      this.slider.append(this.page[left].$el);
+    }
+
+    if (!withoutData) {
+      this.rendered = true;
     }
   },
 
   render: function () {
     this.initPages();
     this.initSlider();
-    this.appendPages();
+    this.renderPages();
 
     this.$el.css({
       position: 'relative',
@@ -210,6 +239,7 @@ _.extend(Carousel.prototype, {
   },
 
   _start: function (evt) {
+    if (!this.rendered) this.renderBuffers();
     this.start.x = evt.originalEvent.touches[0].pageX;
     this.start.y = evt.originalEvent.touches[0].pageY;
     this.start.timeStamp = evt.originalEvent.timeStamp;

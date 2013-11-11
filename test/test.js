@@ -799,4 +799,103 @@ describe('Carousel', function () {
       expect(carousel.page[8].x).to.equal(640);
     });
   });
+
+  describe('render sequence', function () {
+    var el, carousel;
+
+    it('appends visible pages first, right side then left side', function () {
+      el = $('<div id="test" style="width: 320px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: eleven,
+        pageWidth:128
+      });
+
+      sinon.spy(carousel.slider, 'append');
+      carousel.render();
+      expect(carousel.page.length).to.equal(9);
+      expect(carousel.pages.visible.length).to.equal(3);
+      expect(carousel.pages.visible).to.deep.equal([3, 4, 5]);
+      expect(carousel.slider.append.callCount).to.equal(9);
+
+      expect(carousel.slider.append.getCall(0)).to.have.been.calledWith(carousel.page[3].$el);
+      expect(carousel.slider.append.getCall(1)).to.have.been.calledWith(carousel.page[4].$el);
+      expect(carousel.slider.append.getCall(2)).to.have.been.calledWith(carousel.page[5].$el);
+      expect(carousel.slider.append.getCall(3)).to.have.been.calledWith(carousel.page[6].$el);
+      expect(carousel.slider.append.getCall(4)).to.have.been.calledWith(carousel.page[7].$el);
+      expect(carousel.slider.append.getCall(5)).to.have.been.calledWith(carousel.page[8].$el);
+      expect(carousel.slider.append.getCall(6)).to.have.been.calledWith(carousel.page[0].$el);
+      expect(carousel.slider.append.getCall(7)).to.have.been.calledWith(carousel.page[1].$el);
+      expect(carousel.slider.append.getCall(8)).to.have.been.calledWith(carousel.page[2].$el);
+
+      el.remove();
+    });
+
+    it('delays rendering buffer page content until explicity requested', function () {
+      el = $('<div id="test" style="width: 320px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: eleven,
+        delayBuffers: true,
+        pageWidth:128
+      });
+
+      sinon.spy(carousel, 'template');
+      sinon.spy(carousel.slider, 'append');
+      carousel.render();
+      expect(carousel.page.length).to.equal(9);
+      expect(carousel.pages.visible.length).to.equal(3);
+      expect(carousel.pages.visible).to.deep.equal([3, 4, 5]);
+      expect(carousel.slider.append.callCount).to.equal(9);
+      expect(carousel.template.callCount).to.equal(3);
+
+      expect(carousel.template.getCall(0).calledWith({ content: '0' })).to.be.ok;
+      expect(carousel.template.getCall(1).calledWith({ content: '1' })).to.be.ok;
+      expect(carousel.template.getCall(2).calledWith({ content: '2' })).to.be.ok;
+
+      carousel.renderBuffers();
+      expect(carousel.template.callCount).to.equal(9);
+      expect(carousel.template.getCall(3).calledWith({ content: '3' })).to.be.ok;
+      expect(carousel.template.getCall(4).calledWith({ content: '4' })).to.be.ok;
+      expect(carousel.template.getCall(5).calledWith({ content: '5' })).to.be.ok;
+      expect(carousel.template.getCall(6).calledWith(undefined)).to.be.ok;
+      expect(carousel.template.getCall(7).calledWith(undefined)).to.be.ok;
+      expect(carousel.template.getCall(8).calledWith(undefined)).to.be.ok;
+
+      el.remove();
+    });
+
+    it('delays rendering buffer page content, but renders them if interaction occurs', function () {
+      el = $('<div id="test" style="width: 320px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: eleven,
+        delayBuffers: true,
+        pageWidth:128
+      });
+
+      sinon.spy(carousel, 'template');
+      sinon.spy(carousel, 'renderBuffers');
+      carousel.render();
+
+      triggerTouches(carousel, [{"x":268,"page":0,"y":136,"timeStamp":1384198647970},{"x":267,"page":0,"y":136,"timeStamp":1384198647984},{"x":266,"page":0,"y":136,"timeStamp":1384198648003},{"x":263,"page":0,"y":136,"timeStamp":1384198648024},{"x":260,"page":0,"y":136,"timeStamp":1384198648045},{"x":256,"page":0,"y":136,"timeStamp":1384198648057},{"x":254,"page":0,"y":136,"timeStamp":1384198648074},{"x":250,"page":0,"y":136,"timeStamp":1384198648091},{"x":247,"page":0,"y":136,"timeStamp":1384198648108},{"x":246,"page":0,"y":136,"timeStamp":1384198648125},{"x":244,"page":0,"y":136,"timeStamp":1384198648142},{"x":243,"page":0,"y":136,"timeStamp":1384198648158},{"x":242,"page":0,"y":136,"timeStamp":1384198648175},{"x":242,"page":0,"y":136,"timeStamp":1384198648191}]);
+      expect(carousel.renderBuffers).to.have.been.calledTwice;
+
+      expect(carousel.template.callCount).to.equal(9);
+      expect(carousel.template.getCall(3).calledWith({ content: '3' })).to.be.ok;
+      expect(carousel.template.getCall(4).calledWith({ content: '4' })).to.be.ok;
+      expect(carousel.template.getCall(5).calledWith({ content: '5' })).to.be.ok;
+      expect(carousel.template.getCall(6).calledWith(undefined)).to.be.ok;
+      expect(carousel.template.getCall(7).calledWith(undefined)).to.be.ok;
+      expect(carousel.template.getCall(8).calledWith(undefined)).to.be.ok;
+
+      el.remove();
+    });
+  });
 })
