@@ -48,24 +48,26 @@
   <script type="text/javascript">
 
     $(function() {
-      var carousel = new Carousel({
-        el: '#test',
-        pageWidth: 128,
-        data: [
-          { content: '0' },
-          { content: '1' },
-          { content: '2' },
-          { content: '3' },
-          { content: '4' },
-          { content: '5' },
-          { content: '6' },
-          { content: '7' },
-          { content: '8' },
-          { content: '9' },
-          { content: '10' },
-        ]
+      _.defer(function () {
+        var carousel = new Carousel({
+          el: '#test',
+          pageWidth: 128,
+          data: [
+            { content: '0' },
+            { content: '1' },
+            { content: '2' },
+            { content: '3' },
+            { content: '4' },
+            { content: '5' },
+            { content: '6' },
+            { content: '7' },
+            { content: '8' },
+            { content: '9' },
+            { content: '10' },
+          ]
+        });
+        carousel.render();
       });
-      carousel.render();
     });
 
   </script>

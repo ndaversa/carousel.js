@@ -25,12 +25,13 @@ var dummyStyle = document.createElement('div').style,
 function Carousel(options) {
   options || (options = {});
 
-  this.container = {};
+  this.container = {width: 0};
   this.current = {x: 0, page:0};
   this.delta = {x: 0, page: 0};
   this.limit = {left: {x: 0}, right: {x:0}};
   this.move = {x: 0, page: 0};
   this.next = {x: 0, page:0};
+  this.pages = {visible: 0, total: 0, buffer:0};
   this.start = {x: 0, page:0};
 
   this._configure(options);
@@ -38,7 +39,6 @@ function Carousel(options) {
 
 var carouselOptions = [
   'animationDuration',
-  'bufferPages',
   'data',
   'el',
   'loop',
@@ -70,10 +70,12 @@ _.extend(Carousel.prototype, {
     this.$el = $(this.el);
     this.el = this.$el[0];
     this.container.width = this.$el.width();
-    this.container.pages = Math.ceil(this.container.width / this.pageWidth);
-    this.bufferPages = this.container.pages;
 
-    this.current.page = this.bufferPages;
+    this.pages.visible = Math.ceil(this.container.width / this.pageWidth);
+    this.pages.side = this.pages.visible;
+    this.pages.total = this.pages.visible * 3;
+
+    this.current.page = this.pages.visible;
   },
 
   pageTemplate: function (data) {
@@ -89,12 +91,12 @@ _.extend(Carousel.prototype, {
   initPages: function () {
     var dataIndex = this.data.length - 1;
 
-    this.page = new Array(this.bufferPages * 2 + 1);
+    this.page = new Array(this.pages.total);
 
     // Build left buffer pages
     for (var i=this.current.page-1; i>=0; i--) {
       var data = this.loop ? this.data[dataIndex-- % this.data.length] : undefined,
-        x = (i - this.bufferPages) * this.pageWidth;
+        x = (i - this.pages.side) * this.pageWidth;
 
       this.page[i] = {
         x: x,
@@ -110,7 +112,7 @@ _.extend(Carousel.prototype, {
     dataIndex = 0;
     for (var i=this.current.page; i<this.page.length; i++) {
       var data,
-        x = (i - this.bufferPages) * this.pageWidth;
+        x = (i - this.pages.side) * this.pageWidth;
 
       if (!this.loop && dataIndex > this.data.length - 1) {
         data = undefined;
@@ -174,7 +176,7 @@ _.extend(Carousel.prototype, {
   crossBoundary: function (previous, current) {
     var rightMostPage = _.max(this.page, function(page) { return page.x; }),
         leftMostPage  = _.min(this.page, function(page) { return page.x; }),
-        currentData   = this.indexShift(leftMostPage.dataIndex, this.bufferPages, this.data.length),
+        currentData   = this.indexShift(leftMostPage.dataIndex, this.pages.side, this.data.length),
         nextRightData = this.indexShift(rightMostPage.dataIndex, 1, this.data.length),
         nextLeftData  = this.indexShift(leftMostPage.dataIndex, -1, this.data.length);
 
@@ -274,7 +276,7 @@ _.extend(Carousel.prototype, {
     }
 
     this.current.x = this.next.x;
-    this.next.page = Math.floor(-this.current.x / this.pageWidth) + this.bufferPages;
+    this.next.page = Math.floor(-this.current.x / this.pageWidth) + this.pages.side;
     this.touches = [];
 
     this.slider.off(transitionEndEvent)
