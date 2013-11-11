@@ -147,10 +147,10 @@ _.extend(Carousel.prototype, {
       transitionTimingFunction: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
       transform: 'translate3d(0px, 0px, 0px)'
     })
-    .on('touchstart', _.bind(this._start, this))
-    .on('touchmove', _.bind(this._move, this))
-    .on('touchend', _.bind(this._end, this))
-    .on('touchcancel', _.bind(this._cancel, this));
+    .on(startEvent, this._start)
+    .on(moveEvent, this._move)
+    .on(endEvent, this._end)
+    .on(cancelEvent, this._cancel);
   },
 
   renderPages: function () {
@@ -240,23 +240,31 @@ _.extend(Carousel.prototype, {
 
   _start: function (evt) {
     if (!this.rendered) this.renderBuffers();
-    this.start.x = evt.originalEvent.touches[0].pageX;
-    this.start.y = evt.originalEvent.touches[0].pageY;
+    var point = hasTouch ? evt.originalEvent.touches[0] : evt.originalEvent;
+    this.start.x = point.pageX;
+    this.start.y = point.pageY;
+    this.initiated = true;
+
     this.start.timeStamp = evt.originalEvent.timeStamp;
     this.touches = [];
     this.touches.push(this.start);
   },
 
   _move: function (evt) {
-    this.move.x = evt.originalEvent.touches[0].pageX;
-    this.move.y = evt.originalEvent.touches[0].pageY;
+    if (!this.initiated) return;
+    var point = hasTouch ? evt.originalEvent.touches[0] : evt.originalEvent;
+    this.move.x = point.pageX;
+    this.move.y = point.pageY;
     this.move.timeStamp = evt.originalEvent.timeStamp;
     this.delta.x = this.move.x - this.start.x;
     this.delta.y = this.move.y - this.start.y;
 
     if (this.animating) this._transitionEnd(); //cleanup running animation
 
-    if (Math.abs(this.delta.y) > Math.abs(this.delta.x)) return;
+    if (Math.abs(this.delta.y) > Math.abs(this.delta.x)) {
+      this._end()
+      return;
+    }
 
     evt.preventDefault(); // needed on Android 2.3 to get more `touchmove` events
     this.touches.push(_(this.move).clone());
@@ -276,7 +284,10 @@ _.extend(Carousel.prototype, {
     });
   },
 
-  _end: function (evt) {
+  _end: function () {
+    if (!this.initiated) return;
+    this.initiated = false;
+
     var transitionEndEvent = 'webkitTransitionEnd transitionend',
       d = this.animationDuration,
       sample = { percentage: 0.25 };

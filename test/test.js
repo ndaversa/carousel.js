@@ -21,6 +21,8 @@ function makeTouchEvent (evt) {
   return {
     originalEvent: {
       timeStamp: evt.timeStamp,
+      pageX: evt.x,
+      pageY: evt.y,
       touches: [{
         pageX: evt.x,
         pageY: evt.y
