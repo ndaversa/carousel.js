@@ -46,6 +46,7 @@ var carouselOptions = [
   'pageTemplate',
   'pageWidth',
   'template',
+  'templateOptions',
 ];
 
 _.extend(Carousel.prototype, {
@@ -57,6 +58,7 @@ _.extend(Carousel.prototype, {
       delayBuffers: false,
       loop: true,
       pageWidth: 256,
+      templateOptions: {},
     };
     _.extend(this, carouselDefaults, _.pick(options, carouselOptions));
     _.bindAll(this, 'crossBoundary', '_start', '_move', '_end', '_transitionEnd');
@@ -87,7 +89,7 @@ _.extend(Carousel.prototype, {
     return '<li style="width:' + this.pageWidth + 'px;"></li>';
   },
 
-  template: function (data) {
+  template: function (data, options) {
     data = data || { content: '' };
     return '' + data.content;
   },
@@ -99,7 +101,7 @@ _.extend(Carousel.prototype, {
 
     // Build left buffer pages
     for (var i=this.current.page-1; i>=0; i--) {
-      var data = this.loop ? this.data[dataIndex-- % this.data.length] : undefined,
+      var data = this.loop ? this.data[dataIndex-- % this.data.length] : {},
         x = (i - this.pages.side) * this.pageWidth;
 
       this.page[i] = {
@@ -119,7 +121,7 @@ _.extend(Carousel.prototype, {
         x = (i - this.pages.side) * this.pageWidth;
 
       if (!this.loop && dataIndex > this.data.length - 1) {
-        data = undefined;
+        data = {};
       }
       else {
         data = this.data[dataIndex++ % this.data.length];
@@ -155,7 +157,7 @@ _.extend(Carousel.prototype, {
 
   renderPages: function () {
     _(this.pages.visible).each(function (i) {
-      this.page[i].$el.html(this.template(this.page[i].data));
+      this.page[i].$el.html(this.template(this.page[i].data, this.templateOptions));
       this.slider.append(this.page[i].$el);
     }, this);
 
@@ -163,19 +165,19 @@ _.extend(Carousel.prototype, {
   },
 
   renderBuffers: function (withoutData) {
-    var right = this.current.page + this.pages.visible.length,
+    var right = (this.current.page + this.pages.visible.length),
       left = 0;
 
     for (; right<this.page.length; right++) {
       if (!withoutData) {
-        this.page[right].$el.html(this.template(this.page[right].data));
+        this.page[right].$el.html(this.template(this.page[right].data, this.templateOptions));
       }
       this.slider.append(this.page[right].$el);
     }
 
     for (; left<this.current.page; left++) {
       if (!withoutData) {
-        this.page[left].$el.html(this.template(this.page[left].data));
+        this.page[left].$el.html(this.template(this.page[left].data, this.templateOptions));
       }
       this.slider.append(this.page[left].$el);
     }
@@ -214,26 +216,26 @@ _.extend(Carousel.prototype, {
         leftMostPage.data = this.data[nextRightData];
       }
       else {
-        leftMostPage.data = undefined;
+        leftMostPage.data = {};
       }
       leftMostPage.dataIndex = nextRightData;
       leftMostPage.x = rightMostPage.x + this.pageWidth;
       leftMostPage.$el
         .css('left', leftMostPage.x + 'px')
-        .html(this.template(leftMostPage.data));
+        .html(this.template(leftMostPage.data, this.templateOptions));
     }
     else { //swiped to the right (show more on left)
       if (this.loop || nextLeftData < currentData) {
         rightMostPage.data = this.data[nextLeftData];
       }
       else {
-        rightMostPage.data = undefined;
+        rightMostPage.data = {};
       }
       rightMostPage.dataIndex = nextLeftData;
       rightMostPage.x = leftMostPage.x - this.pageWidth;
       rightMostPage.$el
         .css('left', rightMostPage.x + 'px')
-        .html(this.template(rightMostPage.data));
+        .html(this.template(rightMostPage.data, this.templateOptions));
     }
     this.current.page = current;
   },

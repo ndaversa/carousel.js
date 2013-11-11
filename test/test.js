@@ -312,8 +312,8 @@ describe('Carousel', function () {
         expect(carousel.current.page).to.equal(2);
         expect(carousel.page.length).to.equal(6);
 
-        expect(carousel.page[0].data).to.deep.equal(undefined);
-        expect(carousel.page[1].data).to.deep.equal(undefined);
+        expect(carousel.page[0].data).to.deep.equal({});
+        expect(carousel.page[1].data).to.deep.equal({});
         expect(carousel.page[2].data).to.deep.equal({ content: '0' });
         expect(carousel.page[3].data).to.deep.equal({ content: '1' });
         expect(carousel.page[4].data).to.deep.equal({ content: '2' });
@@ -336,12 +336,12 @@ describe('Carousel', function () {
         carousel.render();
         expect(carousel.current.page).to.equal(2);
         expect(carousel.page.length).to.equal(6);
-        expect(carousel.page[0].data).to.deep.equal(undefined);
-        expect(carousel.page[1].data).to.deep.equal(undefined);
+        expect(carousel.page[0].data).to.deep.equal({});
+        expect(carousel.page[1].data).to.deep.equal({});
         expect(carousel.page[2].data).to.deep.equal({ content: '0' });
         expect(carousel.page[3].data).to.deep.equal({ content: '1' });
-        expect(carousel.page[4].data).to.deep.equal(undefined);
-        expect(carousel.page[5].data).to.deep.equal(undefined);
+        expect(carousel.page[4].data).to.deep.equal({});
+        expect(carousel.page[5].data).to.deep.equal({});
 
         expect(carousel.page[0].x).to.equal(-512);
         expect(carousel.page[1].x).to.equal(-256);
@@ -361,8 +361,8 @@ describe('Carousel', function () {
         expect(carousel.current.page).to.equal(2);
         expect(carousel.page.length).to.equal(6);
 
-        expect(carousel.page[0].data).to.deep.equal(undefined);
-        expect(carousel.page[1].data).to.deep.equal(undefined);
+        expect(carousel.page[0].data).to.deep.equal({});
+        expect(carousel.page[1].data).to.deep.equal({});
         expect(carousel.page[2].data).to.deep.equal({ content: '0' });
         expect(carousel.page[3].data).to.deep.equal({ content: '1' });
         expect(carousel.page[4].data).to.deep.equal({ content: '2' });
@@ -386,12 +386,12 @@ describe('Carousel', function () {
         expect(carousel.current.page).to.equal(2);
         expect(carousel.page.length).to.equal(6);
 
-        expect(carousel.page[0].data).to.deep.equal(undefined);
-        expect(carousel.page[1].data).to.deep.equal(undefined);
+        expect(carousel.page[0].data).to.deep.equal({});
+        expect(carousel.page[1].data).to.deep.equal({});
         expect(carousel.page[2].data).to.deep.equal({ content: '0' });
-        expect(carousel.page[3].data).to.deep.equal(undefined);
-        expect(carousel.page[4].data).to.deep.equal(undefined);
-        expect(carousel.page[5].data).to.deep.equal(undefined);
+        expect(carousel.page[3].data).to.deep.equal({});
+        expect(carousel.page[4].data).to.deep.equal({});
+        expect(carousel.page[5].data).to.deep.equal({});
 
         expect(carousel.page[0].x).to.equal(-512);
         expect(carousel.page[1].x).to.equal(-256);
@@ -517,12 +517,12 @@ describe('Carousel', function () {
           triggerTouches(carousel, [{"x":299,"page":0,"y":203,"timeStamp":1383919928227},{"x":298,"page":0,"y":203,"timeStamp":1383919928313},{"x":287,"page":0,"y":203,"timeStamp":1383919928329},{"x":265,"page":0,"y":196,"timeStamp":1383919928349},{"x":224,"page":0,"y":178,"timeStamp":1383919928364},{"x":174,"page":0,"y":154,"timeStamp":1383919928382},{"x":141,"page":0,"y":141,"timeStamp":1383919928398},{"x":103,"page":0,"y":125,"timeStamp":1383919928415},{"x":66,"page":0,"y":112,"timeStamp":1383919928432},{"x":42,"page":0,"y":104,"timeStamp":1383919928449},{"x":15,"page":0,"y":95,"timeStamp":1383919928465},{"x":1,"page":0,"y":92,"timeStamp":1383919928482},{"x":-10,"page":0,"y":89,"timeStamp":1383919928503},{"x":-17,"page":0,"y":88,"timeStamp":1383919928518},{"x":-22,"page":0,"y":87,"timeStamp":1383919928535},{"x":-24,"page":0,"y":87,"timeStamp":1383919928552},{"x":-26,"page":0,"y":87,"timeStamp":1383919928569},{"x":-27,"page":0,"y":87,"timeStamp":1383919928586},{"x":-27,"page":0,"y":87,"timeStamp":1383919928604}]);
           expect(carousel.current.page).to.equal(3);
 
-          expect(carousel.page[1].data).to.deep.equal(undefined);
+          expect(carousel.page[1].data).to.deep.equal({});
           expect(carousel.page[2].data).to.deep.equal({ content: '0' });
           expect(carousel.page[3].data).to.deep.equal({ content: '1' });
-          expect(carousel.page[4].data).to.deep.equal(undefined);
-          expect(carousel.page[5].data).to.deep.equal(undefined);
-          expect(carousel.page[0].data).to.deep.equal(undefined);
+          expect(carousel.page[4].data).to.deep.equal({});
+          expect(carousel.page[5].data).to.deep.equal({});
+          expect(carousel.page[0].data).to.deep.equal({});
 
           expect(carousel.page[1].x).to.equal(-256);
           expect(carousel.page[2].x).to.equal(0);
@@ -561,9 +561,9 @@ describe('Carousel', function () {
 
           expect(carousel.page[0].data).to.deep.equal({ content: '4' });
           expect(carousel.page[1].data).to.deep.equal({ content: '5' });
-          expect(carousel.page[2].data).to.deep.equal(undefined);
-          expect(carousel.page[3].data).to.deep.equal(undefined);
-          expect(carousel.page[4].data).to.deep.equal(undefined);
+          expect(carousel.page[2].data).to.deep.equal({});
+          expect(carousel.page[3].data).to.deep.equal({});
+          expect(carousel.page[4].data).to.deep.equal({});
           expect(carousel.page[5].data).to.deep.equal({ content: '3' });
 
           expect(carousel.page[0].x).to.equal(1024);
@@ -755,9 +755,9 @@ describe('Carousel', function () {
       triggerTouches(carousel, [{"x":284,"page":0,"y":133,"timeStamp":1384184688783},{"x":283,"page":0,"y":133,"timeStamp":1384184688922},{"x":281,"page":0,"y":133,"timeStamp":1384184688939},{"x":279,"page":0,"y":133,"timeStamp":1384184688956},{"x":277,"page":0,"y":133,"timeStamp":1384184688975},{"x":275,"page":0,"y":133,"timeStamp":1384184689020},{"x":270,"page":0,"y":133,"timeStamp":1384184689037},{"x":265,"page":0,"y":133,"timeStamp":1384184689071},{"x":263,"page":0,"y":133,"timeStamp":1384184689084},{"x":261,"page":0,"y":133,"timeStamp":1384184689093},{"x":259,"page":0,"y":133,"timeStamp":1384184689123},{"x":257,"page":0,"y":133,"timeStamp":1384184689134},{"x":254,"page":0,"y":133,"timeStamp":1384184689144},{"x":250,"page":0,"y":133,"timeStamp":1384184689183},{"x":249,"page":0,"y":133,"timeStamp":1384184689195},{"x":247,"page":0,"y":132,"timeStamp":1384184689212},{"x":247,"page":0,"y":132,"timeStamp":1384184689257},{"x":245,"page":0,"y":131,"timeStamp":1384184689261},{"x":245,"page":0,"y":131,"timeStamp":1384184689271},{"x":243,"page":0,"y":131,"timeStamp":1384184689279},{"x":242,"page":0,"y":131,"timeStamp":1384184689307},{"x":240,"page":0,"y":131,"timeStamp":1384184689327},{"x":239,"page":0,"y":131,"timeStamp":1384184689333},{"x":238,"page":0,"y":130,"timeStamp":1384184689357},{"x":238,"page":0,"y":130,"timeStamp":1384184689378}])
 
       expect(carousel.current.x).to.equal(-56);
-      expect(carousel.page[0].data).to.deep.equal(undefined);
-      expect(carousel.page[1].data).to.deep.equal(undefined);
-      expect(carousel.page[2].data).to.deep.equal(undefined);
+      expect(carousel.page[0].data).to.deep.equal({});
+      expect(carousel.page[1].data).to.deep.equal({});
+      expect(carousel.page[2].data).to.deep.equal({});
       expect(carousel.page[3].data).to.deep.equal({ content: '0' });
       expect(carousel.page[4].data).to.deep.equal({ content: '1' });
       expect(carousel.page[5].data).to.deep.equal({ content: '2' });
@@ -864,9 +864,9 @@ describe('Carousel', function () {
       expect(carousel.template.getCall(3).calledWith({ content: '3' })).to.be.ok;
       expect(carousel.template.getCall(4).calledWith({ content: '4' })).to.be.ok;
       expect(carousel.template.getCall(5).calledWith({ content: '5' })).to.be.ok;
-      expect(carousel.template.getCall(6).calledWith(undefined)).to.be.ok;
-      expect(carousel.template.getCall(7).calledWith(undefined)).to.be.ok;
-      expect(carousel.template.getCall(8).calledWith(undefined)).to.be.ok;
+      expect(carousel.template.getCall(6).calledWith({})).to.be.ok;
+      expect(carousel.template.getCall(7).calledWith({})).to.be.ok;
+      expect(carousel.template.getCall(8).calledWith({})).to.be.ok;
 
       el.remove();
     });
@@ -893,9 +893,9 @@ describe('Carousel', function () {
       expect(carousel.template.getCall(3).calledWith({ content: '3' })).to.be.ok;
       expect(carousel.template.getCall(4).calledWith({ content: '4' })).to.be.ok;
       expect(carousel.template.getCall(5).calledWith({ content: '5' })).to.be.ok;
-      expect(carousel.template.getCall(6).calledWith(undefined)).to.be.ok;
-      expect(carousel.template.getCall(7).calledWith(undefined)).to.be.ok;
-      expect(carousel.template.getCall(8).calledWith(undefined)).to.be.ok;
+      expect(carousel.template.getCall(6).calledWith({})).to.be.ok;
+      expect(carousel.template.getCall(7).calledWith({})).to.be.ok;
+      expect(carousel.template.getCall(8).calledWith({})).to.be.ok;
 
       el.remove();
     });
