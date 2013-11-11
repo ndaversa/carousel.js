@@ -251,7 +251,7 @@ _.extend(Carousel.prototype, {
       d = this.animationDuration,
       sample = { percentage: 0.25 };
 
-    //uncomment below to generate touch events used for simulation during tests
+    //uncomment below to generate touch events used for simulation in tests
     // console.log('_end, touches', JSON.stringify(this.touches));
 
     sample.size = Math.ceil(this.touches.length * sample.percentage);
@@ -266,6 +266,10 @@ _.extend(Carousel.prototype, {
       sample.position = Math.ceil(sample.velocity * (d - d * d / (2 * d)));
 
       this.next.x += sample.position;
+    }
+
+    if (Math.abs(sample.velocity) > this.pageWidth * 8 ) { //significant momentum
+      this.next.x = Math.round(this.next.x / this.pageWidth) * this.pageWidth;
     }
 
     if (this.next.x > this.limit.left.x) {

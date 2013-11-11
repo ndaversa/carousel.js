@@ -402,6 +402,7 @@ describe('Carousel', function () {
   }); //describe initial layout
 
   describe('page management', function () {
+    var el, carousel;
     describe('when looping', function () {
 
       beforeEach(function () {
@@ -617,6 +618,8 @@ describe('Carousel', function () {
   });
 
   describe('momentum', function () {
+    var el, carousel;
+
     beforeEach(function () {
       el = $('<div id="test" style="width: 320px;" />');
       el.appendTo('body');
@@ -637,12 +640,14 @@ describe('Carousel', function () {
       triggerTouches(carousel, [{"x":295,"page":0,"y":209,"timeStamp":1383945237960},{"x":291,"page":0,"y":209,"timeStamp":1383945238122},{"x":272,"page":0,"y":209,"timeStamp":1383945238139},{"x":224,"page":0,"y":209,"timeStamp":1383945238156},{"x":166,"page":0,"y":204,"timeStamp":1383945238173},{"x":105,"page":0,"y":191,"timeStamp":1383945238190},{"x":55,"page":0,"y":171,"timeStamp":1383945238207}]); 
       expect(carousel.crossBoundary.getCall(0)).to.have.been.calledWith(2, 3);
       expect(carousel.crossBoundary.getCall(1)).to.have.been.calledWith(3, 4);
-      expect(carousel.crossBoundary).to.have.been.calledTwice;
-      expect(carousel.current.page).to.equal(4);
+      expect(carousel.crossBoundary.getCall(2)).to.have.been.calledWith(4, 5);
+      expect(carousel.crossBoundary).to.have.been.calledThrice;
+      expect(carousel.current.page).to.equal(5);
     });
   });
 
   describe('buffer pages', function () {
+    var el, carousel;
 
     it('it creates an ideal number of buffer pages for a 320px wide layout', function () {
       el = $('<div id="test" style="width: 320px;" />');
@@ -722,6 +727,76 @@ describe('Carousel', function () {
       expect(carousel.pages.side).to.equal(8);
 
       el.remove();
+    });
+  });
+
+  describe('page snapping', function () {
+    var el, carousel;
+
+    beforeEach(function () {
+      el = $('<div id="test" style="width: 320px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: eleven,
+        pageWidth:128
+      });
+      carousel.render();
+    });
+
+    afterEach(function () {
+      el.remove();
+    });
+
+    it('does not snap when momentum is not significant', function () {
+      triggerTouches(carousel, [{"x":284,"page":0,"y":133,"timeStamp":1384184688783},{"x":283,"page":0,"y":133,"timeStamp":1384184688922},{"x":281,"page":0,"y":133,"timeStamp":1384184688939},{"x":279,"page":0,"y":133,"timeStamp":1384184688956},{"x":277,"page":0,"y":133,"timeStamp":1384184688975},{"x":275,"page":0,"y":133,"timeStamp":1384184689020},{"x":270,"page":0,"y":133,"timeStamp":1384184689037},{"x":265,"page":0,"y":133,"timeStamp":1384184689071},{"x":263,"page":0,"y":133,"timeStamp":1384184689084},{"x":261,"page":0,"y":133,"timeStamp":1384184689093},{"x":259,"page":0,"y":133,"timeStamp":1384184689123},{"x":257,"page":0,"y":133,"timeStamp":1384184689134},{"x":254,"page":0,"y":133,"timeStamp":1384184689144},{"x":250,"page":0,"y":133,"timeStamp":1384184689183},{"x":249,"page":0,"y":133,"timeStamp":1384184689195},{"x":247,"page":0,"y":132,"timeStamp":1384184689212},{"x":247,"page":0,"y":132,"timeStamp":1384184689257},{"x":245,"page":0,"y":131,"timeStamp":1384184689261},{"x":245,"page":0,"y":131,"timeStamp":1384184689271},{"x":243,"page":0,"y":131,"timeStamp":1384184689279},{"x":242,"page":0,"y":131,"timeStamp":1384184689307},{"x":240,"page":0,"y":131,"timeStamp":1384184689327},{"x":239,"page":0,"y":131,"timeStamp":1384184689333},{"x":238,"page":0,"y":130,"timeStamp":1384184689357},{"x":238,"page":0,"y":130,"timeStamp":1384184689378}])
+
+      expect(carousel.current.x).to.equal(-56);
+      expect(carousel.page[0].data).to.deep.equal(undefined);
+      expect(carousel.page[1].data).to.deep.equal(undefined);
+      expect(carousel.page[2].data).to.deep.equal(undefined);
+      expect(carousel.page[3].data).to.deep.equal({ content: '0' });
+      expect(carousel.page[4].data).to.deep.equal({ content: '1' });
+      expect(carousel.page[5].data).to.deep.equal({ content: '2' });
+      expect(carousel.page[6].data).to.deep.equal({ content: '3' });
+      expect(carousel.page[7].data).to.deep.equal({ content: '4' });
+      expect(carousel.page[8].data).to.deep.equal({ content: '5' });
+
+      expect(carousel.page[0].x).to.equal(-384);
+      expect(carousel.page[1].x).to.equal(-256);
+      expect(carousel.page[2].x).to.equal(-128);
+      expect(carousel.page[3].x).to.equal(0);
+      expect(carousel.page[4].x).to.equal(128);
+      expect(carousel.page[5].x).to.equal(256);
+      expect(carousel.page[6].x).to.equal(384);
+      expect(carousel.page[7].x).to.equal(512);
+      expect(carousel.page[8].x).to.equal(640);
+    });
+
+    it('does snap when momentum is significant', function () {
+      triggerTouches(carousel, [{"x":286,"page":0,"y":165,"timeStamp":1384184975988},{"x":285,"page":0,"y":165,"timeStamp":1384184976025},{"x":281,"page":0,"y":165,"timeStamp":1384184976044},{"x":272,"page":0,"y":165,"timeStamp":1384184976065},{"x":254,"page":0,"y":163,"timeStamp":1384184976082},{"x":227,"page":0,"y":158,"timeStamp":1384184976099},{"x":138,"page":0,"y":135,"timeStamp":1384184976129},{"x":109,"page":0,"y":131,"timeStamp":1384184976150}])
+
+      expect(carousel.current.x).to.equal(-384);
+      expect(carousel.page[0].data).to.deep.equal({ content: '6'});
+      expect(carousel.page[1].data).to.deep.equal({ content: '7'});
+      expect(carousel.page[2].data).to.deep.equal({ content: '8'});
+      expect(carousel.page[3].data).to.deep.equal({ content: '0' });
+      expect(carousel.page[4].data).to.deep.equal({ content: '1' });
+      expect(carousel.page[5].data).to.deep.equal({ content: '2' });
+      expect(carousel.page[6].data).to.deep.equal({ content: '3' });
+      expect(carousel.page[7].data).to.deep.equal({ content: '4' });
+      expect(carousel.page[8].data).to.deep.equal({ content: '5' });
+
+      expect(carousel.page[0].x).to.equal(768);
+      expect(carousel.page[1].x).to.equal(896);
+      expect(carousel.page[2].x).to.equal(1024);
+      expect(carousel.page[3].x).to.equal(0);
+      expect(carousel.page[4].x).to.equal(128);
+      expect(carousel.page[5].x).to.equal(256);
+      expect(carousel.page[6].x).to.equal(384);
+      expect(carousel.page[7].x).to.equal(512);
+      expect(carousel.page[8].x).to.equal(640);
     });
   });
 })
