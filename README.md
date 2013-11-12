@@ -88,6 +88,12 @@ npm install
 bower install
 ```
 
+If you don't have bower installed globally already, you can run:
+
+```
+npm install -g bower
+```
+
 Testing relies on the Karma test-runner. If you'd like to use Karma to
 automatically watch and re-run the test file during development, it's easiest
 to globally install Karma and run it from the CLI.
