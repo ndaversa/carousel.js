@@ -9,14 +9,12 @@
   <div id="test" style="width: 100%; height: 200px;"></div>
 
   <style>
-
     ul.slider {
       margin: 0;
       border: 0;
       padding: 0;
       font-size: 0;
       list-style-type: none;
-      background: grey;
     }
 
     ul.slider li {
@@ -24,12 +22,11 @@
       height: 100%;
     }
 
-    ul.slider li:nth-child(5n+1) { background: #D5FBFF; }
-    ul.slider li:nth-child(5n+2) { background: #9FBCBF; }
-    ul.slider li:nth-child(5n+3) { background: #647678; }
-    ul.slider li:nth-child(5n+4) { background: #2F3738; }
-    ul.slider li:nth-child(5n+5) { background: #59D8E6; }
-
+    ul.slider li img {
+      width: 100%;
+      height: 100%;
+      pointer-events: none
+    }
   </style>
 
   <script type="text/javascript" src="bower_components/jquery/jquery.js"></script>
@@ -42,21 +39,20 @@
       _.defer(function () {
         var carousel = new Carousel({
           el: '#test',
-          loop: false,
           pageWidth: 128,
           data: [
-            { content: '0' },
-            { content: '1' },
-            { content: '2' },
-            { content: '3' },
-            { content: '4' },
-            { content: '5' },
-            { content: '6' },
-            { content: '7' },
-            { content: '8' },
-            { content: '9' },
-            { content: '10' },
-          ]
+            { url: 'http://placehold.it/128x200/D5FBFF' },
+            { url: 'http://placehold.it/128x200/9FBCBF' },
+            { url: 'http://placehold.it/128x200/647678' },
+            { url: 'http://placehold.it/128x200/2F3738' },
+            { url: 'http://placehold.it/128x200/59D8E6' },
+          ],
+          template: function (data, options) {
+            if (data && data.url) {
+              return '<img src="' + data.url + '" />';
+            }
+            return '';
+          }
         });
         carousel.render();
       });
