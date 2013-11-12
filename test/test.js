@@ -312,8 +312,8 @@ describe('Carousel', function () {
         expect(carousel.current.page).to.equal(2);
         expect(carousel.page.length).to.equal(6);
 
-        expect(carousel.page[0].data).to.deep.equal({});
-        expect(carousel.page[1].data).to.deep.equal({});
+        expect(carousel.page[0].data).to.deep.equal({ content: '' });
+        expect(carousel.page[1].data).to.deep.equal({ content: '' });
         expect(carousel.page[2].data).to.deep.equal({ content: '0' });
         expect(carousel.page[3].data).to.deep.equal({ content: '1' });
         expect(carousel.page[4].data).to.deep.equal({ content: '2' });
@@ -336,12 +336,12 @@ describe('Carousel', function () {
         carousel.render();
         expect(carousel.current.page).to.equal(2);
         expect(carousel.page.length).to.equal(6);
-        expect(carousel.page[0].data).to.deep.equal({});
-        expect(carousel.page[1].data).to.deep.equal({});
+        expect(carousel.page[0].data).to.deep.equal({ content: '' });
+        expect(carousel.page[1].data).to.deep.equal({ content: '' });
         expect(carousel.page[2].data).to.deep.equal({ content: '0' });
         expect(carousel.page[3].data).to.deep.equal({ content: '1' });
-        expect(carousel.page[4].data).to.deep.equal({});
-        expect(carousel.page[5].data).to.deep.equal({});
+        expect(carousel.page[4].data).to.deep.equal({ content: '' });
+        expect(carousel.page[5].data).to.deep.equal({ content: '' });
 
         expect(carousel.page[0].x).to.equal(-512);
         expect(carousel.page[1].x).to.equal(-256);
@@ -361,8 +361,8 @@ describe('Carousel', function () {
         expect(carousel.current.page).to.equal(2);
         expect(carousel.page.length).to.equal(6);
 
-        expect(carousel.page[0].data).to.deep.equal({});
-        expect(carousel.page[1].data).to.deep.equal({});
+        expect(carousel.page[0].data).to.deep.equal({ content: '' });
+        expect(carousel.page[1].data).to.deep.equal({ content: '' });
         expect(carousel.page[2].data).to.deep.equal({ content: '0' });
         expect(carousel.page[3].data).to.deep.equal({ content: '1' });
         expect(carousel.page[4].data).to.deep.equal({ content: '2' });
@@ -386,12 +386,12 @@ describe('Carousel', function () {
         expect(carousel.current.page).to.equal(2);
         expect(carousel.page.length).to.equal(6);
 
-        expect(carousel.page[0].data).to.deep.equal({});
-        expect(carousel.page[1].data).to.deep.equal({});
+        expect(carousel.page[0].data).to.deep.equal({ content: '' });
+        expect(carousel.page[1].data).to.deep.equal({ content: '' });
         expect(carousel.page[2].data).to.deep.equal({ content: '0' });
-        expect(carousel.page[3].data).to.deep.equal({});
-        expect(carousel.page[4].data).to.deep.equal({});
-        expect(carousel.page[5].data).to.deep.equal({});
+        expect(carousel.page[3].data).to.deep.equal({ content: '' });
+        expect(carousel.page[4].data).to.deep.equal({ content: '' });
+        expect(carousel.page[5].data).to.deep.equal({ content: '' });
 
         expect(carousel.page[0].x).to.equal(-512);
         expect(carousel.page[1].x).to.equal(-256);
@@ -515,21 +515,21 @@ describe('Carousel', function () {
         it('does not load data after the largest index (prevents wrapping)', function () {
           sinon.spy(carousel, "crossBoundary");
           triggerTouches(carousel, [{"x":299,"page":0,"y":203,"timeStamp":1383919928227},{"x":298,"page":0,"y":203,"timeStamp":1383919928313},{"x":287,"page":0,"y":203,"timeStamp":1383919928329},{"x":265,"page":0,"y":196,"timeStamp":1383919928349},{"x":224,"page":0,"y":178,"timeStamp":1383919928364},{"x":174,"page":0,"y":154,"timeStamp":1383919928382},{"x":141,"page":0,"y":141,"timeStamp":1383919928398},{"x":103,"page":0,"y":125,"timeStamp":1383919928415},{"x":66,"page":0,"y":112,"timeStamp":1383919928432},{"x":42,"page":0,"y":104,"timeStamp":1383919928449},{"x":15,"page":0,"y":95,"timeStamp":1383919928465},{"x":1,"page":0,"y":92,"timeStamp":1383919928482},{"x":-10,"page":0,"y":89,"timeStamp":1383919928503},{"x":-17,"page":0,"y":88,"timeStamp":1383919928518},{"x":-22,"page":0,"y":87,"timeStamp":1383919928535},{"x":-24,"page":0,"y":87,"timeStamp":1383919928552},{"x":-26,"page":0,"y":87,"timeStamp":1383919928569},{"x":-27,"page":0,"y":87,"timeStamp":1383919928586},{"x":-27,"page":0,"y":87,"timeStamp":1383919928604}]);
-          expect(carousel.current.page).to.equal(3);
+          expect(carousel.current.page).to.equal(2);
 
-          expect(carousel.page[1].data).to.deep.equal({});
+          expect(carousel.page[0].data).to.deep.equal({ content: '' });
+          expect(carousel.page[1].data).to.deep.equal({ content: '' });
           expect(carousel.page[2].data).to.deep.equal({ content: '0' });
           expect(carousel.page[3].data).to.deep.equal({ content: '1' });
-          expect(carousel.page[4].data).to.deep.equal({});
-          expect(carousel.page[5].data).to.deep.equal({});
-          expect(carousel.page[0].data).to.deep.equal({});
+          expect(carousel.page[4].data).to.deep.equal({ content: '' });
+          expect(carousel.page[5].data).to.deep.equal({ content: '' });
 
+          expect(carousel.page[0].x).to.equal(-512);
           expect(carousel.page[1].x).to.equal(-256);
           expect(carousel.page[2].x).to.equal(0);
           expect(carousel.page[3].x).to.equal(256);
           expect(carousel.page[4].x).to.equal(512);
           expect(carousel.page[5].x).to.equal(768);
-          expect(carousel.page[0].x).to.equal(1024);
         });
       });
       describe('when swiping to the right (show more on the left)', function () {
@@ -556,22 +556,22 @@ describe('Carousel', function () {
           triggerTouches(carousel, [{"x":300,"page":0,"y":210,"timeStamp":1383919982720},{"x":299,"page":0,"y":210,"timeStamp":1383919982790},{"x":295,"page":0,"y":210,"timeStamp":1383919982807},{"x":286,"page":0,"y":210,"timeStamp":1383919982824},{"x":274,"page":0,"y":210,"timeStamp":1383919982841},{"x":248,"page":0,"y":204,"timeStamp":1383919982858},{"x":205,"page":0,"y":193,"timeStamp":1383919982875},{"x":149,"page":0,"y":176,"timeStamp":1383919982893},{"x":93,"page":0,"y":160,"timeStamp":1383919982910},{"x":73,"page":0,"y":154,"timeStamp":1383919982927},{"x":52,"page":0,"y":148,"timeStamp":1383919982944},{"x":33,"page":0,"y":144,"timeStamp":1383919982961},{"x":20,"page":0,"y":141,"timeStamp":1383919982978},{"x":11,"page":0,"y":139,"timeStamp":1383919982995},{"x":1,"page":0,"y":138,"timeStamp":1383919983012},{"x":-6,"page":0,"y":137,"timeStamp":1383919983035},{"x":-11,"page":0,"y":136,"timeStamp":1383919983047},{"x":-16,"page":0,"y":136,"timeStamp":1383919983065},{"x":-19,"page":0,"y":135,"timeStamp":1383919983081},{"x":-20,"page":0,"y":135,"timeStamp":1383919983098},{"x":-21,"page":0,"y":135,"timeStamp":1383919983117}]);
           triggerTouches(carousel, [{"x":293,"page":0,"y":220,"timeStamp":1383919984632},{"x":292,"page":0,"y":220,"timeStamp":1383919984725},{"x":287,"page":0,"y":220,"timeStamp":1383919984742},{"x":277,"page":0,"y":220,"timeStamp":1383919984759},{"x":254,"page":0,"y":220,"timeStamp":1383919984777},{"x":234,"page":0,"y":220,"timeStamp":1383919984793},{"x":206,"page":0,"y":220,"timeStamp":1383919984811},{"x":182,"page":0,"y":220,"timeStamp":1383919984828},{"x":163,"page":0,"y":219,"timeStamp":1383919984845},{"x":152,"page":0,"y":218,"timeStamp":1383919984862},{"x":133,"page":0,"y":216,"timeStamp":1383919984880},{"x":124,"page":0,"y":214,"timeStamp":1383919984897},{"x":111,"page":0,"y":214,"timeStamp":1383919984914},{"x":103,"page":0,"y":213,"timeStamp":1383919984931},{"x":96,"page":0,"y":212,"timeStamp":1383919984949},{"x":89,"page":0,"y":212,"timeStamp":1383919984965},{"x":83,"page":0,"y":212,"timeStamp":1383919984982},{"x":79,"page":0,"y":212,"timeStamp":1383919984999},{"x":74,"page":0,"y":212,"timeStamp":1383919985016},{"x":71,"page":0,"y":212,"timeStamp":1383919985033},{"x":68,"page":0,"y":212,"timeStamp":1383919985050},{"x":66,"page":0,"y":212,"timeStamp":1383919985067},{"x":64,"page":0,"y":212,"timeStamp":1383919985084},{"x":63,"page":0,"y":212,"timeStamp":1383919985101},{"x":62,"page":0,"y":212,"timeStamp":1383919985123}]);
           triggerTouches(carousel, [{"x":304,"page":0,"y":203,"timeStamp":1383919986444},{"x":303,"page":0,"y":203,"timeStamp":1383919986554},{"x":298,"page":0,"y":203,"timeStamp":1383919986572},{"x":289,"page":0,"y":203,"timeStamp":1383919986589},{"x":276,"page":0,"y":203,"timeStamp":1383919986605},{"x":258,"page":0,"y":203,"timeStamp":1383919986623},{"x":235,"page":0,"y":203,"timeStamp":1383919986640},{"x":205,"page":0,"y":198,"timeStamp":1383919986656},{"x":186,"page":0,"y":193,"timeStamp":1383919986673},{"x":164,"page":0,"y":187,"timeStamp":1383919986690},{"x":147,"page":0,"y":184,"timeStamp":1383919986706},{"x":131,"page":0,"y":180,"timeStamp":1383919986724},{"x":114,"page":0,"y":176,"timeStamp":1383919986741},{"x":101,"page":0,"y":174,"timeStamp":1383919986759},{"x":90,"page":0,"y":171,"timeStamp":1383919986775},{"x":82,"page":0,"y":170,"timeStamp":1383919986793},{"x":74,"page":0,"y":169,"timeStamp":1383919986810},{"x":67,"page":0,"y":168,"timeStamp":1383919986827},{"x":61,"page":0,"y":168,"timeStamp":1383919986845},{"x":57,"page":0,"y":168,"timeStamp":1383919986862},{"x":51,"page":0,"y":168,"timeStamp":1383919986879},{"x":48,"page":0,"y":167,"timeStamp":1383919986897},{"x":47,"page":0,"y":167,"timeStamp":1383919986913},{"x":46,"page":0,"y":167,"timeStamp":1383919986937}]);
-          expect(carousel.crossBoundary.callCount).to.equal(5);
-          expect(carousel.current.page).to.equal(7);
+          expect(carousel.crossBoundary.callCount).to.equal(4);
+          expect(carousel.current.page).to.equal(6);
 
           expect(carousel.page[0].data).to.deep.equal({ content: '4' });
           expect(carousel.page[1].data).to.deep.equal({ content: '5' });
-          expect(carousel.page[2].data).to.deep.equal({});
-          expect(carousel.page[3].data).to.deep.equal({});
-          expect(carousel.page[4].data).to.deep.equal({});
+          expect(carousel.page[2].data).to.deep.equal({ content: '' });
+          expect(carousel.page[3].data).to.deep.equal({ content: '' });
+          expect(carousel.page[4].data).to.deep.equal({ content: '2' });
           expect(carousel.page[5].data).to.deep.equal({ content: '3' });
 
+          expect(carousel.page[4].x).to.equal(512);
+          expect(carousel.page[5].x).to.equal(768);
           expect(carousel.page[0].x).to.equal(1024);
           expect(carousel.page[1].x).to.equal(1280);
           expect(carousel.page[2].x).to.equal(1536);
           expect(carousel.page[3].x).to.equal(1792);
-          expect(carousel.page[4].x).to.equal(2048);
-          expect(carousel.page[5].x).to.equal(768);
         });
       });
     });
@@ -755,9 +755,9 @@ describe('Carousel', function () {
       triggerTouches(carousel, [{"x":284,"page":0,"y":133,"timeStamp":1384184688783},{"x":283,"page":0,"y":133,"timeStamp":1384184688922},{"x":281,"page":0,"y":133,"timeStamp":1384184688939},{"x":279,"page":0,"y":133,"timeStamp":1384184688956},{"x":277,"page":0,"y":133,"timeStamp":1384184688975},{"x":275,"page":0,"y":133,"timeStamp":1384184689020},{"x":270,"page":0,"y":133,"timeStamp":1384184689037},{"x":265,"page":0,"y":133,"timeStamp":1384184689071},{"x":263,"page":0,"y":133,"timeStamp":1384184689084},{"x":261,"page":0,"y":133,"timeStamp":1384184689093},{"x":259,"page":0,"y":133,"timeStamp":1384184689123},{"x":257,"page":0,"y":133,"timeStamp":1384184689134},{"x":254,"page":0,"y":133,"timeStamp":1384184689144},{"x":250,"page":0,"y":133,"timeStamp":1384184689183},{"x":249,"page":0,"y":133,"timeStamp":1384184689195},{"x":247,"page":0,"y":132,"timeStamp":1384184689212},{"x":247,"page":0,"y":132,"timeStamp":1384184689257},{"x":245,"page":0,"y":131,"timeStamp":1384184689261},{"x":245,"page":0,"y":131,"timeStamp":1384184689271},{"x":243,"page":0,"y":131,"timeStamp":1384184689279},{"x":242,"page":0,"y":131,"timeStamp":1384184689307},{"x":240,"page":0,"y":131,"timeStamp":1384184689327},{"x":239,"page":0,"y":131,"timeStamp":1384184689333},{"x":238,"page":0,"y":130,"timeStamp":1384184689357},{"x":238,"page":0,"y":130,"timeStamp":1384184689378}])
 
       expect(carousel.current.x).to.equal(-56);
-      expect(carousel.page[0].data).to.deep.equal({});
-      expect(carousel.page[1].data).to.deep.equal({});
-      expect(carousel.page[2].data).to.deep.equal({});
+      expect(carousel.page[0].data).to.deep.equal({ content: '' });
+      expect(carousel.page[1].data).to.deep.equal({ content: '' });
+      expect(carousel.page[2].data).to.deep.equal({ content: '' });
       expect(carousel.page[3].data).to.deep.equal({ content: '0' });
       expect(carousel.page[4].data).to.deep.equal({ content: '1' });
       expect(carousel.page[5].data).to.deep.equal({ content: '2' });
@@ -864,9 +864,9 @@ describe('Carousel', function () {
       expect(carousel.template.getCall(3).calledWith({ content: '3' })).to.be.ok;
       expect(carousel.template.getCall(4).calledWith({ content: '4' })).to.be.ok;
       expect(carousel.template.getCall(5).calledWith({ content: '5' })).to.be.ok;
-      expect(carousel.template.getCall(6).calledWith({})).to.be.ok;
-      expect(carousel.template.getCall(7).calledWith({})).to.be.ok;
-      expect(carousel.template.getCall(8).calledWith({})).to.be.ok;
+      expect(carousel.template.getCall(6).calledWith({ content: '' })).to.be.ok;
+      expect(carousel.template.getCall(7).calledWith({ content: '' })).to.be.ok;
+      expect(carousel.template.getCall(8).calledWith({ content: '' })).to.be.ok;
 
       el.remove();
     });
@@ -893,9 +893,9 @@ describe('Carousel', function () {
       expect(carousel.template.getCall(3).calledWith({ content: '3' })).to.be.ok;
       expect(carousel.template.getCall(4).calledWith({ content: '4' })).to.be.ok;
       expect(carousel.template.getCall(5).calledWith({ content: '5' })).to.be.ok;
-      expect(carousel.template.getCall(6).calledWith({})).to.be.ok;
-      expect(carousel.template.getCall(7).calledWith({})).to.be.ok;
-      expect(carousel.template.getCall(8).calledWith({})).to.be.ok;
+      expect(carousel.template.getCall(6).calledWith({ content: '' })).to.be.ok;
+      expect(carousel.template.getCall(7).calledWith({ content: '' })).to.be.ok;
+      expect(carousel.template.getCall(8).calledWith({ content: '' })).to.be.ok;
 
       el.remove();
     });

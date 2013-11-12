@@ -62,14 +62,6 @@ _.extend(Carousel.prototype, {
     };
     _.extend(this, carouselDefaults, _.pick(options, carouselOptions));
     _.bindAll(this, 'crossBoundary', '_start', '_move', '_end', '_transitionEnd');
-    if (!this.loop) {
-      this.limit.left.x = 0;
-      this.limit.right.x = (this.data.length - 1) * -this.pageWidth;
-    }
-    else {
-      this.limit.left.x = Infinity;
-      this.limit.right.x = -Infinity;
-    }
 
     this.$el = $(this.el);
     this.el = this.$el[0];
@@ -78,10 +70,20 @@ _.extend(Carousel.prototype, {
     this.container.width = this.$el.width();
 
     this.pages.side = Math.ceil(this.container.width / this.pageWidth);
-    this.pages.visible = _.range(this.pages.side, 2*this.pages.side);
+    this.pages.visible = _.range(this.pages.side, 2 * this.pages.side);
     this.pages.total = this.pages.side * 3;
 
     this.current.page = this.pages.side;
+
+    if (!this.loop) {
+      this.limit.left.x = 0;
+      this.limit.right.x = this.data.length * -this.pageWidth + this.container.width;
+    }
+    else {
+      this.limit.left.x = Infinity;
+      this.limit.right.x = -Infinity;
+    }
+
     this.rendered = false;
   },
 
@@ -90,7 +92,8 @@ _.extend(Carousel.prototype, {
   },
 
   template: function (data, options) {
-    data = data || { content: '' };
+    data = data || {};
+    data.content = data.content || '';
     return '' + data.content;
   },
 
