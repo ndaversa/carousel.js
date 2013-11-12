@@ -62,7 +62,7 @@ _.extend(Carousel.prototype, {
       templateOptions: {},
     };
     _.extend(this, carouselDefaults, _.pick(options, carouselOptions));
-    _.bindAll(this, 'crossBoundary', '_start', '_move', '_end', '_transitionEnd');
+    _.bindAll(this, 'crossBoundary', '_start', '_move', '_end', '_cancel', '_transitionEnd');
 
     this.$el = $(this.el);
     this.el = this.$el[0];
