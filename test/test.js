@@ -145,6 +145,17 @@ describe('Carousel', function () {
       expect(carousel.el.id).to.equal('test');
       $('#test').remove();
     });
+
+    it('accepts an initial offset value', function () {
+      $('<div id="test" />').appendTo('body');
+      var carousel = new Carousel({
+        el: '#test',
+        initialOffset: 25,
+      });
+
+      $('#test').remove();
+      expect(carousel.current.x).to.equal(25);
+    });
   });
 
   describe('render', function () {

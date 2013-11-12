@@ -42,6 +42,7 @@ var carouselOptions = [
   'data',
   'delayBuffers',
   'el',
+  'initialOffset',
   'loop',
   'pageTemplate',
   'pageWidth',
@@ -74,6 +75,10 @@ _.extend(Carousel.prototype, {
     this.pages.total = this.pages.side * 3;
 
     this.current.page = this.pages.side;
+
+    if (this.initialOffset) {
+      this.current.x = this.initialOffset;
+    }
 
     if (!this.loop) {
       this.limit.left.x = 0;
@@ -150,7 +155,7 @@ _.extend(Carousel.prototype, {
       width: '100%',
       transitionDuration: '0s',
       transitionTimingFunction: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
-      transform: 'translate3d(0px, 0px, 0px)'
+      transform: 'translate3d(' + this.current.x + 'px, 0px, 0px)'
     })
     .on(startEvent, this._start)
     .on(moveEvent, this._move)
@@ -253,6 +258,10 @@ _.extend(Carousel.prototype, {
     this.start.timeStamp = evt.originalEvent.timeStamp;
     this.touches = [];
     this.touches.push(this.start);
+
+    this.slider.css({
+      transitionDuration: '0s'
+    });
   },
 
   _move: function (evt) {
@@ -278,14 +287,16 @@ _.extend(Carousel.prototype, {
     if (this.next.x > this.limit.left.x) { //left-most limit
       this.next.x -= Math.round(this.delta.x/2);
     }
+    else if (this.next.x < this.limit.right.x && this.current.x === 0) {
+      this.next.x -= Math.round(this.delta.x/2);
+    }
     else if (this.next.x < this.limit.right.x) { //right-most limit
       this.delta.bounce = this.limit.right.x - this.next.x;
       this.next.x = this.limit.right.x - Math.round(this.delta.bounce/2);
     }
 
     this.slider.css({
-      transform: 'translate3d(' + this.next.x + 'px, 0, 0)',
-      transitionDuration: '0s'
+      transform: 'translate3d(' + this.next.x + 'px, 0, 0)'
     });
   },
 
@@ -319,6 +330,9 @@ _.extend(Carousel.prototype, {
     }
 
     if (this.next.x > this.limit.left.x) {
+      this.next.x = this.limit.left.x;
+    }
+    else if (this.next.x < this.limit.right.x && this.current.x === 0) {
       this.next.x = this.limit.left.x;
     }
     else if (this.next.x < this.limit.right.x) {
