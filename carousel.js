@@ -332,11 +332,11 @@ _.extend(Carousel.prototype, {
     if (this.next.x > this.limit.left.x) {
       this.next.x = this.limit.left.x;
     }
-    else if (this.next.x < this.limit.right.x && this.current.x === 0) {
-      this.next.x = this.limit.left.x;
-    }
     else if (this.next.x < this.limit.right.x) {
       this.next.x = this.limit.right.x;
+      if (this.next.x > this.limit.left.x) {
+        this.next.x = this.limit.left.x;
+      }
     }
 
     this.current.x = this.next.x;

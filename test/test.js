@@ -631,31 +631,68 @@ describe('Carousel', function () {
   });
 
   describe('momentum', function () {
-    var el, carousel;
 
-    beforeEach(function () {
-      el = $('<div id="test" style="width: 320px;" />');
-      el.appendTo('body');
-      carousel = new Carousel({
-        el: '#test',
-        loop: false,
-        data: eleven
+    describe('when data does not fill screen', function () {
+      var el, carousel;
+
+      beforeEach(function () {
+        el = $('<div id="test" style="width: 320px;" />');
+        el.appendTo('body');
+        carousel = new Carousel({
+          el: '#test',
+          loop: false,
+          pageWidth: 128,
+          data: two
+        });
+        carousel.render();
       });
-      carousel.render();
+
+      afterEach(function () {
+        el.remove();
+      });
+
+      it('aligns to left bound not right bound when flick to the left', function () {
+        triggerTouches(carousel, [{"x":234,"page":0,"y":115,"timeStamp":1384293486624},{"x":233,"page":0,"y":115,"timeStamp":1384293486664},{"x":229,"page":0,"y":115,"timeStamp":1384293486682},{"x":221,"page":0,"y":115,"timeStamp":1384293486699},{"x":209,"page":0,"y":115,"timeStamp":1384293486716},{"x":196,"page":0,"y":115,"timeStamp":1384293486733},{"x":179,"page":0,"y":115,"timeStamp":1384293486751},{"x":159,"page":0,"y":115,"timeStamp":1384293486768},{"x":139,"page":0,"y":115,"timeStamp":1384293486785},{"x":119,"page":0,"y":115,"timeStamp":1384293486802},{"x":99,"page":0,"y":114,"timeStamp":1384293486819},{"x":85,"page":0,"y":113,"timeStamp":1384293486836},{"x":71,"page":0,"y":113,"timeStamp":1384293486856},{"x":59,"page":0,"y":113,"timeStamp":1384293486870},{"x":48,"page":0,"y":113,"timeStamp":1384293486887},{"x":43,"page":0,"y":112,"timeStamp":1384293486904},{"x":39,"page":0,"y":111,"timeStamp":1384293486921}]);
+        expect(carousel.current.x).to.equal(0);
+      });
+
     });
 
-    afterEach(function () {
-      el.remove();
-    });
+    describe('when data does at least fill screen', function() {
+      var el, carousel;
 
-    it('scrolls with momentum when quick flick gesture is used', function () {
-      sinon.spy(carousel, "crossBoundary");
-      triggerTouches(carousel, [{"x":295,"page":0,"y":209,"timeStamp":1383945237960},{"x":291,"page":0,"y":209,"timeStamp":1383945238122},{"x":272,"page":0,"y":209,"timeStamp":1383945238139},{"x":224,"page":0,"y":209,"timeStamp":1383945238156},{"x":166,"page":0,"y":204,"timeStamp":1383945238173},{"x":105,"page":0,"y":191,"timeStamp":1383945238190},{"x":55,"page":0,"y":171,"timeStamp":1383945238207}]); 
-      expect(carousel.crossBoundary.getCall(0)).to.have.been.calledWith(2, 3);
-      expect(carousel.crossBoundary.getCall(1)).to.have.been.calledWith(3, 4);
-      expect(carousel.crossBoundary.getCall(2)).to.have.been.calledWith(4, 5);
-      expect(carousel.crossBoundary).to.have.been.calledThrice;
-      expect(carousel.current.page).to.equal(5);
+      beforeEach(function () {
+        el = $('<div id="test" style="width: 320px;" />');
+        el.appendTo('body');
+        carousel = new Carousel({
+          el: '#test',
+          loop: false,
+          pageWidth: 128,
+          data: five
+        });
+        carousel.render();
+      });
+
+      afterEach(function () {
+        el.remove();
+      });
+
+      it('scrolls with momentum when quick flick gesture is used', function () {
+        sinon.spy(carousel, "crossBoundary");
+        triggerTouches(carousel, [{"x":288,"page":0,"y":129,"timeStamp":1384292413175},{"x":277,"page":0,"y":129,"timeStamp":1384292413225},{"x":267,"page":0,"y":129,"timeStamp":1384292413242},{"x":259,"page":0,"y":129,"timeStamp":1384292413259},{"x":247,"page":0,"y":128,"timeStamp":1384292413275},{"x":233,"page":0,"y":124,"timeStamp":1384292413292},{"x":219,"page":0,"y":120,"timeStamp":1384292413308}]); 
+        expect(carousel.crossBoundary).to.have.been.calledOnce;
+        expect(carousel.crossBoundary.getCall(0)).to.have.been.calledWith(3, 4);
+        expect(carousel.current.page).to.equal(4);
+      });
+
+      it('scrolls to bound when momentum is significant and bound limit is exceeded', function () {
+        sinon.spy(carousel, "crossBoundary");
+        triggerTouches(carousel, [{"x":296,"page":0,"y":114,"timeStamp":1384292561490},{"x":288,"page":0,"y":113,"timeStamp":1384292561504},{"x":268,"page":0,"y":113,"timeStamp":1384292561520},{"x":236,"page":0,"y":114,"timeStamp":1384292561538},{"x":198,"page":0,"y":116,"timeStamp":1384292561554},{"x":152,"page":0,"y":120,"timeStamp":1384292561570},{"x":96,"page":0,"y":129,"timeStamp":1384292561587},{"x":45,"page":0,"y":143,"timeStamp":1384292561605}]); 
+        expect(carousel.crossBoundary).to.have.been.calledTwice;
+        expect(carousel.crossBoundary.getCall(0)).to.have.been.calledWith(3, 4);
+        expect(carousel.crossBoundary.getCall(1)).to.have.been.calledWith(4, 5);
+        expect(carousel.current.page).to.equal(5);
+      });
     });
   });
 
