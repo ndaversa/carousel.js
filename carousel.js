@@ -17,8 +17,8 @@ var dummyStyle = document.createElement('div').style,
   startEvent = hasTouch ? 'touchstart' : 'mousedown',
   moveEvent = hasTouch ? 'touchmove' : 'mousemove',
   endEvent = hasTouch ? 'touchend' : 'mouseup',
-  cancelEvent = hasTouch ? 'touchcancel' : 'mouseup';
-  transitionEndEvent = 'webkitTransitionEnd transitionend',
+  cancelEvent = hasTouch ? 'touchcancel' : 'mouseup',
+  transitionEndEvent = 'webkitTransitionEnd transitionend';
 
 // ---------------------------------------------------------------------------
 // Carousel.js
