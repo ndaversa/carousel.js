@@ -47,6 +47,11 @@ function triggerTouches (obj, touches) {
   obj.slider.trigger('transitionend');
 }
 
+function triggerResize (carousel, width) {
+  carousel.$el.width(width);
+  carousel._resize();
+}
+
 describe('Carousel', function () {
   var one = [
       { content: '0' },
@@ -677,14 +682,6 @@ describe('Carousel', function () {
         el.remove();
       });
 
-      it('scrolls with momentum when quick flick gesture is used', function () {
-        sinon.spy(carousel, "crossBoundary");
-        triggerTouches(carousel, [{"x":288,"page":0,"y":129,"timeStamp":1384292413175},{"x":277,"page":0,"y":129,"timeStamp":1384292413225},{"x":267,"page":0,"y":129,"timeStamp":1384292413242},{"x":259,"page":0,"y":129,"timeStamp":1384292413259},{"x":247,"page":0,"y":128,"timeStamp":1384292413275},{"x":233,"page":0,"y":124,"timeStamp":1384292413292},{"x":219,"page":0,"y":120,"timeStamp":1384292413308}]); 
-        expect(carousel.crossBoundary).to.have.been.calledOnce;
-        expect(carousel.crossBoundary.getCall(0)).to.have.been.calledWith(3, 4);
-        expect(carousel.current.page).to.equal(4);
-      });
-
       it('scrolls to bound when momentum is significant and bound limit is exceeded', function () {
         sinon.spy(carousel, "crossBoundary");
         triggerTouches(carousel, [{"x":296,"page":0,"y":114,"timeStamp":1384292561490},{"x":288,"page":0,"y":113,"timeStamp":1384292561504},{"x":268,"page":0,"y":113,"timeStamp":1384292561520},{"x":236,"page":0,"y":114,"timeStamp":1384292561538},{"x":198,"page":0,"y":116,"timeStamp":1384292561554},{"x":152,"page":0,"y":120,"timeStamp":1384292561570},{"x":96,"page":0,"y":129,"timeStamp":1384292561587},{"x":45,"page":0,"y":143,"timeStamp":1384292561605}]); 
@@ -692,6 +689,42 @@ describe('Carousel', function () {
         expect(carousel.crossBoundary.getCall(0)).to.have.been.calledWith(3, 4);
         expect(carousel.crossBoundary.getCall(1)).to.have.been.calledWith(4, 5);
         expect(carousel.current.page).to.equal(5);
+      });
+
+    });
+
+    describe('fast swipes', function() {
+      var el, carousel;
+
+      beforeEach(function () {
+        el = $('<div id="test" style="width: 320px;" />');
+        el.appendTo('body');
+        carousel = new Carousel({
+          el: '#test',
+          pageWidth: 128,
+          data: eleven
+        });
+        carousel.render();
+      });
+
+      afterEach(function () {
+        el.remove();
+      });
+
+      it('scrolls with momentum when quick flick gesture is used', function () {
+        sinon.spy(carousel, "crossBoundary");
+        triggerTouches(carousel,[{"x":311,"page":0,"y":64,"timeStamp":1384369891724},{"x":311,"page":0,"y":64,"timeStamp":1384369891740},{"x":298,"page":0,"y":64,"timeStamp":1384369891757},{"x":272,"page":0,"y":64,"timeStamp":1384369891783},{"x":208,"page":0,"y":64,"timeStamp":1384369891792},{"x":147,"page":0,"y":64,"timeStamp":1384369891809},{"x":82,"page":0,"y":59,"timeStamp":1384369891826},{"x":18,"page":0,"y":50,"timeStamp":1384369891843},{"x":0,"page":0,"y":43,"timeStamp":1384369891860}]); 
+        expect(carousel.crossBoundary.callCount).to.equal(4);
+        expect(carousel.crossBoundary.getCall(0)).to.have.been.calledWith(3, 4);
+        expect(carousel.crossBoundary.getCall(1)).to.have.been.calledWith(4, 5);
+        expect(carousel.crossBoundary.getCall(2)).to.have.been.calledWith(5, 6);
+        expect(carousel.crossBoundary.getCall(3)).to.have.been.calledWith(6, 7);
+        expect(carousel.current.page).to.equal(7);
+      });
+
+      it('limits exit velocity when flicking quickly', function () {
+        triggerTouches(carousel, [{"x":296,"page":0,"y":82,"timeStamp":1384369592100},{"x":296,"page":0,"y":82,"timeStamp":1384369592104},{"x":293,"page":0,"y":82,"timeStamp":1384369592117},{"x":286,"page":0,"y":82,"timeStamp":1384369592134},{"x":272,"page":0,"y":82,"timeStamp":1384369592151},{"x":242,"page":0,"y":82,"timeStamp":1384369592168},{"x":191,"page":0,"y":82,"timeStamp":1384369592186},{"x":150,"page":0,"y":82,"timeStamp":1384369592203},{"x":92,"page":0,"y":82,"timeStamp":1384369592221},{"x":63,"page":0,"y":82,"timeStamp":1384369592237}]);
+        expect(carousel.current.x).to.equal(-512); //velocity is not exposed, but we can check final position for this expectation
       });
     });
   });
@@ -946,6 +979,44 @@ describe('Carousel', function () {
       expect(carousel.template.getCall(8).calledWith({ content: '' })).to.be.ok;
 
       el.remove();
+    });
+  });
+
+  describe('orientation changes', function () {
+    var el, carousel;
+
+    beforeEach(function () {
+      el = $('<div id="test" style="width: 320px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: five,
+        pageWidth:128
+      });
+      carousel.render();
+    });
+
+    afterEach(function () {
+      el.remove();
+    });
+
+    it('updates the container width', function () {
+      expect(carousel.container.width).to.equal(320);
+      triggerResize(carousel, 480);
+      expect(carousel.container.width).to.equal(480);
+    });
+
+    it('updates limits', function () {
+      expect(carousel.limit).to.deep.equal({ left: { x: 0 }, right: { x: -320 } });
+      triggerResize(carousel, 480);
+      expect(carousel.limit).to.deep.equal({ left: { x: 0 }, right: { x: -160 } });
+    });
+
+    it('repositions carousel slider if it is no longer in carousel limits', function () {
+      triggerTouches(carousel, [{"x":314,"page":0,"y":111,"timeStamp":1384370967381},{"x":313,"page":0,"y":111,"timeStamp":1384370967782},{"x":309,"page":0,"y":111,"timeStamp":1384370967800},{"x":298,"page":0,"y":111,"timeStamp":1384370967825},{"x":272,"page":0,"y":111,"timeStamp":1384370967840},{"x":240,"page":0,"y":110,"timeStamp":1384370967857},{"x":204,"page":0,"y":106,"timeStamp":1384370967871},{"x":169,"page":0,"y":100,"timeStamp":1384370967889},{"x":134,"page":0,"y":93,"timeStamp":1384370967906},{"x":95,"page":0,"y":85,"timeStamp":1384370967922},{"x":66,"page":0,"y":82,"timeStamp":1384370967938},{"x":49,"page":0,"y":82,"timeStamp":1384370967955}]);
+      triggerResize(carousel, 480);
+      expect(carousel.current.x).to.equal(-160);
     });
   });
 })
