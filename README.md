@@ -116,4 +116,4 @@ npm test
 * Safari (latest)
 * Mobile Safari (iOS 5+)
 * Android Browser 2.3+
-* Possibly more (untested)
+* Likely many other versions
