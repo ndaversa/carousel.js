@@ -28,7 +28,6 @@ function Carousel(options) {
 
   this.container = {width: 0};
   this.current = {x: 0, page:0};
-  this.delta = {x: 0, page: 0};
   this.limit = {left: {x: 0}, right: {x:0}};
   this.next = {x: 0, page:0};
   this.pages = {visible: 0, total: 0, buffer:0};
@@ -272,11 +271,12 @@ _.extend(Carousel.prototype, {
     var point = hasTouch ? evt.originalEvent.touches[0] : evt.originalEvent;
     this.start.x = point.pageX;
     this.start.y = point.pageY;
+    this.start.timeStamp = evt.originalEvent.timeStamp;
     this.initiated = true;
 
-    this.start.timeStamp = evt.originalEvent.timeStamp;
-    this.touches = [];
-    this.touches.push(this.start);
+    this.touches = [this.start];
+    this.steps = { x: 0, y: 0 };
+    this.next.x = this.current.x;
 
     this.slider.css({
       transitionDuration: '0s'
@@ -286,28 +286,37 @@ _.extend(Carousel.prototype, {
   _move: function (evt) {
     if (!this.initiated) return;
     var point = hasTouch ? evt.originalEvent.touches[0] : evt.originalEvent,
-      move = { x: point.pageX, y: point.pageY, timeStamp: evt.originalEvent.timeStamp };
-    this.delta.x = move.x - this.start.x;
-    this.delta.y = move.y - this.start.y;
+      move = { x: point.pageX, y: point.pageY, timeStamp: evt.originalEvent.timeStamp },
+      last = _(this.touches).last(),
+      delta = { x: move.x- last.x, y: move.y - last.y };
+
+    this.steps.x += Math.abs(delta.x);
+    this.steps.y += Math.abs(delta.y);
 
     if (this.animating) this._transitionEnd(); //cleanup running animation
 
-    if (Math.abs(this.delta.y) > Math.abs(this.delta.x)) {
+    //Wait for 10 pixel movement before beginning animations
+    if (this.steps.x < 10 && this.steps.y < 10) {
+      return;
+    }
+
+    //If overall movement is greater in y direction, end animations
+    if (this.steps.y > this.steps.x) {
       this._end()
       return;
     }
 
-    evt.preventDefault(); // needed on Android 2.3 to get more `touchmove` events
     this.touches.push(move);
-    this.next.x = this.current.x + this.delta.x;
+    evt.preventDefault(); // prevent vertical scrolling
+    this.next.x += delta.x;
 
     if (this.next.x > this.limit.left.x) { //left-most limit
-      this.delta.bounce = Math.round((this.limit.left.x - this.next.x) / 2);
-      this.next.x = this.limit.left.x - this.delta.bounce
+      delta.bounce = Math.round((this.limit.left.x - this.next.x) / 2);
+      this.next.x = this.limit.left.x - delta.bounce
     }
     else if (this.next.x < this.limit.right.x) {
-      this.delta.bounce = Math.round((this.limit.right.x - this.next.x) / 2);
-      this.next.x = this.limit.right.x - this.delta.bounce;
+      delta.bounce = Math.round((this.limit.right.x - this.next.x) / 2);
+      this.next.x = this.limit.right.x - delta.bounce;
     }
 
     this.slider.css({
@@ -363,8 +372,8 @@ _.extend(Carousel.prototype, {
 
   _transitionEnd: function () {
     this.animating = false;
-    this.delta.page = Math.abs(this.next.page - this.current.page);
-    for (var i=0; i < this.delta.page; i++) {
+    var delta = Math.abs(this.next.page - this.current.page);
+    for (var i=0; i < delta; i++) {
       if (this.next.page > this.current.page) {
         this.crossBoundary(this.current.page, this.current.page + 1);
       }
