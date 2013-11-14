@@ -310,13 +310,9 @@ _.extend(Carousel.prototype, {
     evt.preventDefault(); // prevent vertical scrolling
     this.next.x += delta.x;
 
-    if (this.next.x > this.limit.left.x) { //left-most limit
-      delta.bounce = Math.round((this.limit.left.x - this.next.x) / 2);
-      this.next.x = this.limit.left.x - delta.bounce
-    }
-    else if (this.next.x < this.limit.right.x) {
-      delta.bounce = Math.round((this.limit.right.x - this.next.x) / 2);
-      this.next.x = this.limit.right.x - delta.bounce;
+    //Check if we are at a limit, if so, only move by half of delta
+    if (this.next.x > this.limit.left.x || this.next.x < this.limit.right.x) {
+      this.next.x -= Math.round(delta.x / 2);
     }
 
     this.slider.css({
