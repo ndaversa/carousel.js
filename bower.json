@@ -13,11 +13,12 @@
   ],
   "devDependencies": {
     "chai": "*",
-    "lodash": "~2.2.1",
-    "jquery": "~2.0.3",
     "sinon-chai": "~2.4.0",
     "sinonjs": "~1.7.1"
   },
   "dependencies": {
+    "jquery": "~2.0.3",
+    "lodash": "~2.2.1",
+    "imagesloaded": "~3.0.4"
   }
 }

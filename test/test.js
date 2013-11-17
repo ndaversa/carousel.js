@@ -94,6 +94,40 @@ describe('Carousel', function () {
       { content: '9' },
       { content: '10' },
     ],
+    fiveImages1 = [
+      { url: 'http://placehold.it/128x200/D5FBFF' },
+      { url: 'http://placehold.it/128x200/9FBCBF' },
+      { url: 'http://placehold.it/128x200/647678' },
+      { url: 'http://placehold.it/128x200/2F3738' },
+      { url: 'http://placehold.it/128x200/59D8E6' },
+    ],
+    fiveImages2 = [
+      { url: 'http://placehold.it/128x200/85DB18' },
+      { url: 'http://placehold.it/128x200/CDE855' },
+      { url: 'http://placehold.it/128x200/F5F6D4' },
+      { url: 'http://placehold.it/128x200/A7C520' },
+      { url: 'http://placehold.it/128x200/493F0B' },
+    ],
+    fiveImages3 = [
+      { url: 'http://placehold.it/128x200/DC3522' },
+      { url: 'http://placehold.it/128x200/D9CB9E' },
+      { url: 'http://placehold.it/128x200/374140' },
+      { url: 'http://placehold.it/128x200/2A2C2B' },
+      { url: 'http://placehold.it/128x200/1E1E20' },
+    ],
+    elevenImages = [
+      { url: 'http://placehold.it/128x200/D5FBFF' },
+      { url: 'http://placehold.it/128x200/9FBCBF' },
+      { url: 'http://placehold.it/128x200/647678' },
+      { url: 'http://placehold.it/128x200/2F3738' },
+      { url: 'http://placehold.it/128x200/59D8E6' },
+      { url: 'http://placehold.it/128x200/D6FBFF' },
+      { url: 'http://placehold.it/128x200/FFBCBF' },
+      { url: 'http://placehold.it/128x200/747678' },
+      { url: 'http://placehold.it/128x200/3F3738' },
+      { url: 'http://placehold.it/128x200/69D8E6' },
+      { url: 'http://placehold.it/128x200/79D8E6' },
+    ],
     carousel,
     el;
 
@@ -1017,6 +1051,144 @@ describe('Carousel', function () {
       triggerTouches(carousel, [{"x":314,"page":0,"y":111,"timeStamp":1384370967381},{"x":313,"page":0,"y":111,"timeStamp":1384370967782},{"x":309,"page":0,"y":111,"timeStamp":1384370967800},{"x":298,"page":0,"y":111,"timeStamp":1384370967825},{"x":272,"page":0,"y":111,"timeStamp":1384370967840},{"x":240,"page":0,"y":110,"timeStamp":1384370967857},{"x":204,"page":0,"y":106,"timeStamp":1384370967871},{"x":169,"page":0,"y":100,"timeStamp":1384370967889},{"x":134,"page":0,"y":93,"timeStamp":1384370967906},{"x":95,"page":0,"y":85,"timeStamp":1384370967922},{"x":66,"page":0,"y":82,"timeStamp":1384370967938},{"x":49,"page":0,"y":82,"timeStamp":1384370967955}]);
       triggerResize(carousel, 480);
       expect(carousel.current.x).to.equal(-160);
+    });
+  });
+
+  describe('management of image loading', function () {
+    describe('a single carousel instance', function () {
+      var el, carousel;
+
+      beforeEach(function () {
+        el = $('<div id="test" style="width: 320px;" />');
+        el.appendTo('body');
+        carousel = new Carousel({
+          el: '#test',
+          loop: false,
+          data: elevenImages,
+          manageImages: true,
+          pageWidth:128,
+          template: function (data, options) {
+            data = data || {};
+            data.url = data.url || '';
+            return '<img src="' + data.url + '" />';
+          }
+        });
+      });
+
+      afterEach(function () {
+        el.remove();
+      });
+
+      it('only loads visible images first', function (done) {
+        carousel.render();
+        carousel.$el.imagesLoaded(function (instance) {
+          expect(instance.images.length).to.equal(3);
+          expect(instance.images[0].img.src).to.equal('http://placehold.it/128x200/D5FBFF');
+          expect(instance.images[1].img.src).to.equal('http://placehold.it/128x200/9FBCBF');
+          expect(instance.images[2].img.src).to.equal('http://placehold.it/128x200/647678');
+          done();
+        });
+      });
+    });
+
+
+    describe('multiple carousel instances', function () {
+      var el, el2, el3, carousel1, carousel2, carousel3;
+
+      beforeEach(function () {
+        el = $('<div id="test" style="width: 320px;" />');
+        el2 = $('<div id="test2" style="width: 320px;" />');
+        el3 = $('<div id="test3" style="width: 320px;" />');
+        el.appendTo('body');
+        el2.appendTo('body');
+        el3.appendTo('body');
+        carousel = new Carousel({
+          el: '#test',
+          loop: false,
+          data: fiveImages1,
+          manageImages: true,
+          pageWidth:128,
+          template: function (data, options) {
+            data = data || {};
+            data.url = data.url || '';
+            return '<img src="' + data.url + '" />';
+          }
+        });
+        carousel2 = new Carousel({
+          el: '#test2',
+          loop: false,
+          data: fiveImages2,
+          manageImages: true,
+          pageWidth:128,
+          template: function (data, options) {
+            data = data || {};
+            data.url = data.url || '';
+            return '<img src="' + data.url + '" />';
+          }
+        });
+        carousel3 = new Carousel({
+          el: '#test3',
+          loop: false,
+          data: fiveImages3,
+          manageImages: true,
+          pageWidth:128,
+          template: function (data, options) {
+            data = data || {};
+            data.url = data.url || '';
+            return '<img src="' + data.url + '" />';
+          }
+        });
+      });
+
+      afterEach(function () {
+        el.remove();
+      });
+
+      it('loads visible images for all instances first', function (done) {
+        var count = 0;
+        carousel.render();
+        carousel2.render();
+        carousel3.render();
+        carousel.$el.imagesLoaded(function (instance) {
+          expect(instance.images.length).to.equal(3);
+          expect(instance.images[0].img.src).to.equal('http://placehold.it/128x200/D5FBFF');
+          expect(instance.images[1].img.src).to.equal('http://placehold.it/128x200/9FBCBF');
+          expect(instance.images[2].img.src).to.equal('http://placehold.it/128x200/647678');
+          expect(carousel.rendered).to.equal(false);
+          expect(carousel2.rendered).to.equal(false);
+          expect(carousel3.rendered).to.equal(false);
+          count++;
+          expect(count).to.equal(1);
+        });
+        carousel2.$el.imagesLoaded(function (instance) {
+          expect(instance.images.length).to.equal(3);
+          expect(instance.images[0].img.src).to.equal('http://placehold.it/128x200/85DB18');
+          expect(instance.images[1].img.src).to.equal('http://placehold.it/128x200/CDE855');
+          expect(instance.images[2].img.src).to.equal('http://placehold.it/128x200/F5F6D4');
+          expect(carousel.rendered).to.equal(false);
+          expect(carousel2.rendered).to.equal(false);
+          expect(carousel3.rendered).to.equal(false);
+          count++;
+          expect(count).to.equal(2);
+        });
+        carousel3.$el.imagesLoaded(function (instance) {
+          expect(instance.images.length).to.equal(3);
+          expect(instance.images[0].img.src).to.equal('http://placehold.it/128x200/DC3522');
+          expect(instance.images[1].img.src).to.equal('http://placehold.it/128x200/D9CB9E');
+          expect(instance.images[2].img.src).to.equal('http://placehold.it/128x200/374140');
+          count++;
+          expect(count).to.equal(3);
+          expect(carousel.rendered).to.equal(false);
+          expect(carousel2.rendered).to.equal(false);
+          expect(carousel3.rendered).to.equal(false);
+          _.delay(function () {
+            expect(carousel.rendered).to.equal(true);
+            expect(carousel2.rendered).to.equal(true);
+            expect(carousel3.rendered).to.equal(true);
+            done();
+          }, 0);
+        });
+      });
     });
   });
 })

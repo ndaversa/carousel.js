@@ -25,6 +25,8 @@ Just goto the `demo.html` using the `file://` protocol locally
 
 * [jQuery](http://jquery.com/)
 * [Lo-Dash](http://lodash.com/)
+* [imagesLoaded](https://github.com/desandro/imagesloaded) (Optional -
+  only needed if the `manageImages` option is used)
 
 I agree that the above dependencies are unnecessary. However they
 were already dependencies for the project this carousel was built for.
@@ -67,6 +69,9 @@ Other options:
     the carousel (`0` by default)
   * `loop`: a boolean indicating whether the carousel should loop
     (default `true`)
+  * `manageImages`: a boolean indicating that images inside the carousel
+    should be monitored, delaying buffer page construction until visible
+    images are loaded. See additional notes on this behaviour.
   * `pageTemplate`: a function which returns a string containing html markup to construct the
     page (by default it creates `<li>` elements with the `pageWidth` set inline
   * `pageWidth`: the number of pixels wide each page should be (default
@@ -76,6 +81,29 @@ Other options:
     parameters `data` and `options`
   * `templateOptions`: the options that should be passed to the template
     when rendering the content of each page
+
+### How `manageImages` behaves
+
+If you enable the `manageImages` option described above Carousel.js will
+track any `<img>` tags that are added by the `template`. The purpose of
+this is to give visible images priority so they load first before
+attempting to load images for buffer pages. This is accomplished by
+delaying construction of the templates for offscreen buffers. This
+behaviour is also global to all instances of Carousel. That is, if you
+create multiple carousels then no buffer pages will be rendered until
+all visible images for every rendered carousel are loaded. There is an
+exception to this, if you interact with any carousel and the buffer
+pages are not constructed yet, they will be immediately constructed
+for that carousel despite the global image loading state.
+
+#### A note for single page applications
+
+Carousel.js exposes a method called `flush` which may be prudent to call
+when changing the visible elements of your application. This method will
+flush all the buffer page queues so it that all carousels waiting for
+images to load will render their buffer pages immediately.  This will
+prevent any newly created Carousels from being stuck in the middle of
+the image queue.
 
 ## Testing
 

@@ -19,6 +19,9 @@ module.exports = function (config) {
       {pattern: 'demo.html', included: false, watched: false}, //demo can be accessed at http://localhost:9876/base/demo.html
       'bower_components/jquery/jquery.js',
       'bower_components/lodash/dist/lodash.js',
+      'bower_components/eventEmitter/EventEmitter.js',
+      'bower_components/eventie/eventie.js',
+      'bower_components/imagesloaded/imagesloaded.js',
       'bower_components/chai/chai.js',
       'bower_components/sinon-chai/lib/sinon-chai.js',
       'bower_components/sinonjs/sinon.js',

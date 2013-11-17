@@ -7,6 +7,8 @@
 
 <body>
   <div id="test" style="width: 100%; height: 200px;"></div>
+  <div id="test2" style="width: 100%; height: 200px;"></div>
+  <div id="test3" style="width: 100%; height: 200px;"></div>
 
   <style>
     ul.slider, body {
@@ -31,6 +33,9 @@
 
   <script type="text/javascript" src="bower_components/jquery/jquery.js"></script>
   <script type="text/javascript" src="bower_components/lodash/dist/lodash.js"></script>
+  <script type="text/javascript" src="bower_components/eventEmitter/EventEmitter.js"></script>
+  <script type="text/javascript" src="bower_components/eventie/eventie.js"></script>
+  <script type="text/javascript" src="bower_components/imagesloaded/imagesloaded.js"></script>
   <script type="text/javascript" src="carousel.js"></script>
 
   <script type="text/javascript">
@@ -40,6 +45,7 @@
         var carousel = new Carousel({
           el: '#test',
           pageWidth: 128,
+          manageImages: true,
           data: [
             { url: 'http://placehold.it/128x200/D5FBFF' },
             { url: 'http://placehold.it/128x200/9FBCBF' },
@@ -54,7 +60,45 @@
             return '';
           }
         });
+        var carousel2 = new Carousel({
+          el: '#test2',
+          pageWidth: 128,
+          manageImages: true,
+          data: [
+            { url: 'http://placehold.it/128x200/85DB18' },
+            { url: 'http://placehold.it/128x200/CDE855' },
+            { url: 'http://placehold.it/128x200/F5F6D4' },
+            { url: 'http://placehold.it/128x200/A7C520' },
+            { url: 'http://placehold.it/128x200/493F0B' },
+          ],
+          template: function (data, options) {
+            if (data && data.url) {
+              return '<img src="' + data.url + '" />';
+            }
+            return '';
+          }
+        });
+        var carousel3 = new Carousel({
+          el: '#test3',
+          pageWidth: 128,
+          manageImages: true,
+          data: [
+            { url: 'http://placehold.it/128x200/DC3522' },
+            { url: 'http://placehold.it/128x200/D9CB9E' },
+            { url: 'http://placehold.it/128x200/374140' },
+            { url: 'http://placehold.it/128x200/2A2C2B' },
+            { url: 'http://placehold.it/128x200/1E1E20' },
+          ],
+          template: function (data, options) {
+            if (data && data.url) {
+              return '<img src="' + data.url + '" />';
+            }
+            return '';
+          }
+        });
         carousel.render();
+        carousel2.render();
+        carousel3.render();
       });
     });
 
