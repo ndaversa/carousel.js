@@ -1186,7 +1186,7 @@ describe('Carousel', function () {
             expect(carousel2.rendered).to.equal(true);
             expect(carousel3.rendered).to.equal(true);
             done();
-          }, 0);
+          }, 10);
         });
       });
     });
