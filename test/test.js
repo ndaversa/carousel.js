@@ -1146,10 +1146,22 @@ describe('Carousel', function () {
 
       it('loads visible images for all instances first', function (done) {
         var count = 0;
+
+        function finalCheck() {
+          _.delay(function () {
+            expect(carousel.rendered).to.equal(true);
+            expect(carousel2.rendered).to.equal(true);
+            expect(carousel3.rendered).to.equal(true);
+            done();
+          }, 10);
+        }
+
         carousel.render();
         carousel2.render();
         carousel3.render();
+
         carousel.$el.imagesLoaded(function (instance) {
+          count++;
           expect(instance.images.length).to.equal(3);
           expect(instance.images[0].img.src).to.equal('http://placehold.it/128x200/D5FBFF');
           expect(instance.images[1].img.src).to.equal('http://placehold.it/128x200/9FBCBF');
@@ -1157,10 +1169,10 @@ describe('Carousel', function () {
           expect(carousel.rendered).to.equal(false);
           expect(carousel2.rendered).to.equal(false);
           expect(carousel3.rendered).to.equal(false);
-          count++;
-          expect(count).to.equal(1);
+          if (count === 3) finalCheck();
         });
         carousel2.$el.imagesLoaded(function (instance) {
+          count++;
           expect(instance.images.length).to.equal(3);
           expect(instance.images[0].img.src).to.equal('http://placehold.it/128x200/85DB18');
           expect(instance.images[1].img.src).to.equal('http://placehold.it/128x200/CDE855');
@@ -1168,25 +1180,19 @@ describe('Carousel', function () {
           expect(carousel.rendered).to.equal(false);
           expect(carousel2.rendered).to.equal(false);
           expect(carousel3.rendered).to.equal(false);
-          count++;
-          expect(count).to.equal(2);
+          if (count === 3) finalCheck();
         });
         carousel3.$el.imagesLoaded(function (instance) {
+          count++;
+          expect(instance.images.length).to.equal(3);
           expect(instance.images.length).to.equal(3);
           expect(instance.images[0].img.src).to.equal('http://placehold.it/128x200/DC3522');
           expect(instance.images[1].img.src).to.equal('http://placehold.it/128x200/D9CB9E');
           expect(instance.images[2].img.src).to.equal('http://placehold.it/128x200/374140');
-          count++;
-          expect(count).to.equal(3);
           expect(carousel.rendered).to.equal(false);
           expect(carousel2.rendered).to.equal(false);
           expect(carousel3.rendered).to.equal(false);
-          _.delay(function () {
-            expect(carousel.rendered).to.equal(true);
-            expect(carousel2.rendered).to.equal(true);
-            expect(carousel3.rendered).to.equal(true);
-            done();
-          }, 10);
+          if (count === 3) finalCheck();
         });
       });
     });
