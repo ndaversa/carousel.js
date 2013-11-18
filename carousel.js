@@ -196,6 +196,7 @@ _.extend(Carousel.prototype, {
 
   goToDataIndex: function (index) {
     if (index < 0 || index > (this.data.length - 1)) return;
+    if (!this.rendered) this.renderBuffers();
     this.current.x = index * -this.pageWidth;
     this._enforceLimits();
 
