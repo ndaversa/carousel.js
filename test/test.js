@@ -848,72 +848,115 @@ describe('Carousel', function () {
   });
 
   describe('page snapping', function () {
-    var el, carousel;
+    describe('default behaviour', function () {
+      var el, carousel;
 
-    beforeEach(function () {
-      el = $('<div id="test" style="width: 320px;" />');
-      el.appendTo('body');
-      carousel = new Carousel({
-        el: '#test',
-        loop: false,
-        data: eleven,
-        pageWidth:128
+      beforeEach(function () {
+        el = $('<div id="test" style="width: 320px;" />');
+        el.appendTo('body');
+        carousel = new Carousel({
+          el: '#test',
+          loop: false,
+          data: eleven,
+          pageWidth:128
+        });
+        carousel.render();
       });
-      carousel.render();
+
+      afterEach(function () {
+        el.remove();
+      });
+
+      it('does not snap when momentum is not significant', function () {
+        triggerTouches(carousel, [{"x":284,"page":0,"y":133,"timeStamp":1384184688783},{"x":283,"page":0,"y":133,"timeStamp":1384184688922},{"x":281,"page":0,"y":133,"timeStamp":1384184688939},{"x":279,"page":0,"y":133,"timeStamp":1384184688956},{"x":277,"page":0,"y":133,"timeStamp":1384184688975},{"x":275,"page":0,"y":133,"timeStamp":1384184689020},{"x":270,"page":0,"y":133,"timeStamp":1384184689037},{"x":265,"page":0,"y":133,"timeStamp":1384184689071},{"x":263,"page":0,"y":133,"timeStamp":1384184689084},{"x":261,"page":0,"y":133,"timeStamp":1384184689093},{"x":259,"page":0,"y":133,"timeStamp":1384184689123},{"x":257,"page":0,"y":133,"timeStamp":1384184689134},{"x":254,"page":0,"y":133,"timeStamp":1384184689144},{"x":250,"page":0,"y":133,"timeStamp":1384184689183},{"x":249,"page":0,"y":133,"timeStamp":1384184689195},{"x":247,"page":0,"y":132,"timeStamp":1384184689212},{"x":247,"page":0,"y":132,"timeStamp":1384184689257},{"x":245,"page":0,"y":131,"timeStamp":1384184689261},{"x":245,"page":0,"y":131,"timeStamp":1384184689271},{"x":243,"page":0,"y":131,"timeStamp":1384184689279},{"x":242,"page":0,"y":131,"timeStamp":1384184689307},{"x":240,"page":0,"y":131,"timeStamp":1384184689327},{"x":239,"page":0,"y":131,"timeStamp":1384184689333},{"x":238,"page":0,"y":130,"timeStamp":1384184689357},{"x":238,"page":0,"y":130,"timeStamp":1384184689378}])
+
+        expect(carousel.current.x).to.equal(-54);
+        expect(carousel.page[0].data).to.deep.equal({ content: '' });
+        expect(carousel.page[1].data).to.deep.equal({ content: '' });
+        expect(carousel.page[2].data).to.deep.equal({ content: '' });
+        expect(carousel.page[3].data).to.deep.equal({ content: '0' });
+        expect(carousel.page[4].data).to.deep.equal({ content: '1' });
+        expect(carousel.page[5].data).to.deep.equal({ content: '2' });
+        expect(carousel.page[6].data).to.deep.equal({ content: '3' });
+        expect(carousel.page[7].data).to.deep.equal({ content: '4' });
+        expect(carousel.page[8].data).to.deep.equal({ content: '5' });
+
+        expect(carousel.page[0].x).to.equal(-384);
+        expect(carousel.page[1].x).to.equal(-256);
+        expect(carousel.page[2].x).to.equal(-128);
+        expect(carousel.page[3].x).to.equal(0);
+        expect(carousel.page[4].x).to.equal(128);
+        expect(carousel.page[5].x).to.equal(256);
+        expect(carousel.page[6].x).to.equal(384);
+        expect(carousel.page[7].x).to.equal(512);
+        expect(carousel.page[8].x).to.equal(640);
+      });
+
+      it('does snap when momentum is significant', function () {
+        triggerTouches(carousel, [{"x":286,"page":0,"y":165,"timeStamp":1384184975988},{"x":285,"page":0,"y":165,"timeStamp":1384184976025},{"x":281,"page":0,"y":165,"timeStamp":1384184976044},{"x":272,"page":0,"y":165,"timeStamp":1384184976065},{"x":254,"page":0,"y":163,"timeStamp":1384184976082},{"x":227,"page":0,"y":158,"timeStamp":1384184976099},{"x":138,"page":0,"y":135,"timeStamp":1384184976129},{"x":109,"page":0,"y":131,"timeStamp":1384184976150}])
+
+        expect(carousel.current.x).to.equal(-384);
+        expect(carousel.page[0].data).to.deep.equal({ content: '6'});
+        expect(carousel.page[1].data).to.deep.equal({ content: '7'});
+        expect(carousel.page[2].data).to.deep.equal({ content: '8'});
+        expect(carousel.page[3].data).to.deep.equal({ content: '0' });
+        expect(carousel.page[4].data).to.deep.equal({ content: '1' });
+        expect(carousel.page[5].data).to.deep.equal({ content: '2' });
+        expect(carousel.page[6].data).to.deep.equal({ content: '3' });
+        expect(carousel.page[7].data).to.deep.equal({ content: '4' });
+        expect(carousel.page[8].data).to.deep.equal({ content: '5' });
+
+        expect(carousel.page[0].x).to.equal(768);
+        expect(carousel.page[1].x).to.equal(896);
+        expect(carousel.page[2].x).to.equal(1024);
+        expect(carousel.page[3].x).to.equal(0);
+        expect(carousel.page[4].x).to.equal(128);
+        expect(carousel.page[5].x).to.equal(256);
+        expect(carousel.page[6].x).to.equal(384);
+        expect(carousel.page[7].x).to.equal(512);
+        expect(carousel.page[8].x).to.equal(640);
+      });
+
     });
 
-    afterEach(function () {
-      el.remove();
-    });
+    describe('snap enabled', function () {
+      var el, carousel;
 
-    it('does not snap when momentum is not significant', function () {
-      triggerTouches(carousel, [{"x":284,"page":0,"y":133,"timeStamp":1384184688783},{"x":283,"page":0,"y":133,"timeStamp":1384184688922},{"x":281,"page":0,"y":133,"timeStamp":1384184688939},{"x":279,"page":0,"y":133,"timeStamp":1384184688956},{"x":277,"page":0,"y":133,"timeStamp":1384184688975},{"x":275,"page":0,"y":133,"timeStamp":1384184689020},{"x":270,"page":0,"y":133,"timeStamp":1384184689037},{"x":265,"page":0,"y":133,"timeStamp":1384184689071},{"x":263,"page":0,"y":133,"timeStamp":1384184689084},{"x":261,"page":0,"y":133,"timeStamp":1384184689093},{"x":259,"page":0,"y":133,"timeStamp":1384184689123},{"x":257,"page":0,"y":133,"timeStamp":1384184689134},{"x":254,"page":0,"y":133,"timeStamp":1384184689144},{"x":250,"page":0,"y":133,"timeStamp":1384184689183},{"x":249,"page":0,"y":133,"timeStamp":1384184689195},{"x":247,"page":0,"y":132,"timeStamp":1384184689212},{"x":247,"page":0,"y":132,"timeStamp":1384184689257},{"x":245,"page":0,"y":131,"timeStamp":1384184689261},{"x":245,"page":0,"y":131,"timeStamp":1384184689271},{"x":243,"page":0,"y":131,"timeStamp":1384184689279},{"x":242,"page":0,"y":131,"timeStamp":1384184689307},{"x":240,"page":0,"y":131,"timeStamp":1384184689327},{"x":239,"page":0,"y":131,"timeStamp":1384184689333},{"x":238,"page":0,"y":130,"timeStamp":1384184689357},{"x":238,"page":0,"y":130,"timeStamp":1384184689378}])
+      beforeEach(function () {
+        el = $('<div id="test" style="width: 320px;" />');
+        el.appendTo('body');
+        carousel = new Carousel({
+          el: '#test',
+          loop: false,
+          snap: true,
+          data: eleven,
+          pageWidth:128
+        });
+        carousel.render();
+      });
 
-      expect(carousel.current.x).to.equal(-54);
-      expect(carousel.page[0].data).to.deep.equal({ content: '' });
-      expect(carousel.page[1].data).to.deep.equal({ content: '' });
-      expect(carousel.page[2].data).to.deep.equal({ content: '' });
-      expect(carousel.page[3].data).to.deep.equal({ content: '0' });
-      expect(carousel.page[4].data).to.deep.equal({ content: '1' });
-      expect(carousel.page[5].data).to.deep.equal({ content: '2' });
-      expect(carousel.page[6].data).to.deep.equal({ content: '3' });
-      expect(carousel.page[7].data).to.deep.equal({ content: '4' });
-      expect(carousel.page[8].data).to.deep.equal({ content: '5' });
+      afterEach(function () {
+        el.remove();
+      });
 
-      expect(carousel.page[0].x).to.equal(-384);
-      expect(carousel.page[1].x).to.equal(-256);
-      expect(carousel.page[2].x).to.equal(-128);
-      expect(carousel.page[3].x).to.equal(0);
-      expect(carousel.page[4].x).to.equal(128);
-      expect(carousel.page[5].x).to.equal(256);
-      expect(carousel.page[6].x).to.equal(384);
-      expect(carousel.page[7].x).to.equal(512);
-      expect(carousel.page[8].x).to.equal(640);
-    });
+      it('snaps to next right page when over half of the current page is already travelled', function () {
+        sinon.spy(carousel, "crossBoundary");
+        expect(carousel.current.page).to.equal(3);
+        triggerTouches(carousel, [{"x":275,"page":0,"y":104,"timeStamp":1384791249232},{"x":270,"y":104,"timeStamp":1384791249361},{"x":269,"y":104,"timeStamp":1384791249378},{"x":267,"y":104,"timeStamp":1384791249395},{"x":266,"y":104,"timeStamp":1384791249413},{"x":263,"y":104,"timeStamp":1384791249430},{"x":261,"y":104,"timeStamp":1384791249448},{"x":259,"y":104,"timeStamp":1384791249465},{"x":256,"y":103,"timeStamp":1384791249482},{"x":254,"y":103,"timeStamp":1384791249499},{"x":252,"y":102,"timeStamp":1384791249516},{"x":251,"y":102,"timeStamp":1384791249533},{"x":247,"y":101,"timeStamp":1384791249551},{"x":247,"y":101,"timeStamp":1384791249570},{"x":245,"y":101,"timeStamp":1384791249586},{"x":242,"y":100,"timeStamp":1384791249603},{"x":239,"y":99,"timeStamp":1384791249620},{"x":237,"y":99,"timeStamp":1384791249637},{"x":233,"y":98,"timeStamp":1384791249654},{"x":231,"y":97,"timeStamp":1384791249672},{"x":228,"y":96,"timeStamp":1384791249689},{"x":226,"y":95,"timeStamp":1384791249706},{"x":224,"y":94,"timeStamp":1384791249722},{"x":222,"y":94,"timeStamp":1384791249739},{"x":220,"y":93,"timeStamp":1384791249756},{"x":219,"y":93,"timeStamp":1384791249773},{"x":217,"y":92,"timeStamp":1384791249791},{"x":217,"y":92,"timeStamp":1384791249809},{"x":216,"y":91,"timeStamp":1384791249826},{"x":215,"y":90,"timeStamp":1384791249843},{"x":213,"y":89,"timeStamp":1384791249860},{"x":212,"y":89,"timeStamp":1384791249877},{"x":210,"y":87,"timeStamp":1384791249895},{"x":208,"y":87,"timeStamp":1384791249912},{"x":207,"y":86,"timeStamp":1384791249928},{"x":206,"y":86,"timeStamp":1384791249945},{"x":205,"y":85,"timeStamp":1384791249962},{"x":204,"y":85,"timeStamp":1384791249979},{"x":203,"y":85,"timeStamp":1384791249996},{"x":202,"y":85,"timeStamp":1384791250013},{"x":201,"y":85,"timeStamp":1384791250032},{"x":199,"y":84,"timeStamp":1384791250047},{"x":198,"y":84,"timeStamp":1384791250065},{"x":196,"y":83,"timeStamp":1384791250082},{"x":195,"y":83,"timeStamp":1384791250099},{"x":194,"y":83,"timeStamp":1384791250115},{"x":194,"y":82,"timeStamp":1384791250133},{"x":194,"y":82,"timeStamp":1384791250155},{"x":193,"y":82,"timeStamp":1384791250203}]);
+        expect(carousel.current.x).to.equal(-128);
+        expect(carousel.current.page).to.equal(4);
+        expect(carousel.crossBoundary).to.have.been.calledOnce;
+        expect(carousel.crossBoundary).to.have.been.calledWith(3, 4);
+      });
 
-    it('does snap when momentum is significant', function () {
-      triggerTouches(carousel, [{"x":286,"page":0,"y":165,"timeStamp":1384184975988},{"x":285,"page":0,"y":165,"timeStamp":1384184976025},{"x":281,"page":0,"y":165,"timeStamp":1384184976044},{"x":272,"page":0,"y":165,"timeStamp":1384184976065},{"x":254,"page":0,"y":163,"timeStamp":1384184976082},{"x":227,"page":0,"y":158,"timeStamp":1384184976099},{"x":138,"page":0,"y":135,"timeStamp":1384184976129},{"x":109,"page":0,"y":131,"timeStamp":1384184976150}])
-
-      expect(carousel.current.x).to.equal(-384);
-      expect(carousel.page[0].data).to.deep.equal({ content: '6'});
-      expect(carousel.page[1].data).to.deep.equal({ content: '7'});
-      expect(carousel.page[2].data).to.deep.equal({ content: '8'});
-      expect(carousel.page[3].data).to.deep.equal({ content: '0' });
-      expect(carousel.page[4].data).to.deep.equal({ content: '1' });
-      expect(carousel.page[5].data).to.deep.equal({ content: '2' });
-      expect(carousel.page[6].data).to.deep.equal({ content: '3' });
-      expect(carousel.page[7].data).to.deep.equal({ content: '4' });
-      expect(carousel.page[8].data).to.deep.equal({ content: '5' });
-
-      expect(carousel.page[0].x).to.equal(768);
-      expect(carousel.page[1].x).to.equal(896);
-      expect(carousel.page[2].x).to.equal(1024);
-      expect(carousel.page[3].x).to.equal(0);
-      expect(carousel.page[4].x).to.equal(128);
-      expect(carousel.page[5].x).to.equal(256);
-      expect(carousel.page[6].x).to.equal(384);
-      expect(carousel.page[7].x).to.equal(512);
-      expect(carousel.page[8].x).to.equal(640);
+      it('snaps back to the current page when less then half of the current page is travelled', function () {
+        sinon.spy(carousel, "crossBoundary");
+        expect(carousel.current.page).to.equal(3);
+        triggerTouches(carousel, [{"x":192,"page":0,"y":99,"timeStamp":1384791596290},{"x":183,"y":99,"timeStamp":1384791596395},{"x":181,"y":99,"timeStamp":1384791596412},{"x":179,"y":99,"timeStamp":1384791596430},{"x":174,"y":98,"timeStamp":1384791596449},{"x":173,"y":97,"timeStamp":1384791596467},{"x":171,"y":97,"timeStamp":1384791596494},{"x":168,"y":96,"timeStamp":1384791596513},{"x":168,"y":96,"timeStamp":1384791596522},{"x":166,"y":96,"timeStamp":1384791596531},{"x":166,"y":96,"timeStamp":1384791596550},{"x":165,"y":96,"timeStamp":1384791596610},{"x":164,"y":96,"timeStamp":1384791596615},{"x":163,"y":96,"timeStamp":1384791596736},{"x":163,"y":96,"timeStamp":1384791596753},{"x":162,"y":96,"timeStamp":1384791596779}]);
+        expect(carousel.current.page).to.equal(3);
+        expect(carousel.current.x).to.equal(0);
+        expect(carousel.crossBoundary).to.not.to.been.called;
+      });
     });
   });
 
@@ -1195,6 +1238,56 @@ describe('Carousel', function () {
           if (count === 3) finalCheck();
         });
       });
+    });
+  });
+
+  describe('events', function () {
+    var el, carousel;
+
+    beforeEach(function () {
+      el = $('<div id="test" style="width: 320px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: fiveImages1,
+        pageWidth:128
+      });
+      carousel.render();
+    });
+
+    afterEach(function () {
+      el.remove();
+    });
+
+    it('triggers an event when a boundary is crossed', function () {
+      var onCrossBoundary = sinon.spy();
+      carousel.on('crossboundary', onCrossBoundary);
+      expect(carousel.current.page).to.equal(3);
+      triggerTouches(carousel, [{"x":289,"page":0,"y":96,"timeStamp":1384788154240},{"x":275,"y":96,"timeStamp":1384788154394},{"x":270,"y":96,"timeStamp":1384788154411},{"x":261,"y":96,"timeStamp":1384788154432},{"x":253,"y":96,"timeStamp":1384788154452},{"x":244,"y":94,"timeStamp":1384788154464},{"x":237,"y":92,"timeStamp":1384788154481},{"x":230,"y":92,"timeStamp":1384788154497},{"x":223,"y":90,"timeStamp":1384788154516},{"x":216,"y":89,"timeStamp":1384788154530},{"x":210,"y":89,"timeStamp":1384788154547},{"x":203,"y":87,"timeStamp":1384788154564},{"x":198,"y":86,"timeStamp":1384788154580},{"x":193,"y":85,"timeStamp":1384788154597},{"x":187,"y":85,"timeStamp":1384788154614},{"x":182,"y":83,"timeStamp":1384788154630},{"x":177,"y":82,"timeStamp":1384788154647},{"x":172,"y":82,"timeStamp":1384788154664},{"x":166,"y":81,"timeStamp":1384788154681},{"x":161,"y":80,"timeStamp":1384788154698},{"x":157,"y":80,"timeStamp":1384788154730},{"x":154,"y":79,"timeStamp":1384788154738},{"x":150,"y":78,"timeStamp":1384788154763},{"x":147,"y":78,"timeStamp":1384788154772},{"x":145,"y":78,"timeStamp":1384788154782},{"x":143,"y":77,"timeStamp":1384788154813},{"x":141,"y":76,"timeStamp":1384788154821},{"x":140,"y":75,"timeStamp":1384788154847},{"x":138,"y":75,"timeStamp":1384788154862},{"x":137,"y":75,"timeStamp":1384788154879},{"x":136,"y":74,"timeStamp":1384788154896},{"x":135,"y":74,"timeStamp":1384788154912},{"x":133,"y":73,"timeStamp":1384788154930},{"x":133,"y":73,"timeStamp":1384788154946},{"x":133,"y":73,"timeStamp":1384788154963}]);
+      expect(carousel.current.page).to.equal(4);
+      expect(onCrossBoundary).to.have.been.calledOnce;
+      expect(onCrossBoundary).to.have.been.calledWith({
+        page: 3,
+        dataIndex: 0
+      },{
+        page: 4,
+        dataIndex: 1
+      });
+    });
+
+    it('triggers an event when a transition ends', function () {
+      var onTransitionEnd = sinon.spy();
+      carousel.on('transitionend', onTransitionEnd);
+      triggerTouches(carousel, [{"x":289,"page":0,"y":96,"timeStamp":1384788154240},{"x":275,"y":96,"timeStamp":1384788154394},{"x":270,"y":96,"timeStamp":1384788154411},{"x":261,"y":96,"timeStamp":1384788154432},{"x":253,"y":96,"timeStamp":1384788154452},{"x":244,"y":94,"timeStamp":1384788154464},{"x":237,"y":92,"timeStamp":1384788154481},{"x":230,"y":92,"timeStamp":1384788154497},{"x":223,"y":90,"timeStamp":1384788154516},{"x":216,"y":89,"timeStamp":1384788154530},{"x":210,"y":89,"timeStamp":1384788154547},{"x":203,"y":87,"timeStamp":1384788154564},{"x":198,"y":86,"timeStamp":1384788154580},{"x":193,"y":85,"timeStamp":1384788154597},{"x":187,"y":85,"timeStamp":1384788154614},{"x":182,"y":83,"timeStamp":1384788154630},{"x":177,"y":82,"timeStamp":1384788154647},{"x":172,"y":82,"timeStamp":1384788154664},{"x":166,"y":81,"timeStamp":1384788154681},{"x":161,"y":80,"timeStamp":1384788154698},{"x":157,"y":80,"timeStamp":1384788154730},{"x":154,"y":79,"timeStamp":1384788154738},{"x":150,"y":78,"timeStamp":1384788154763},{"x":147,"y":78,"timeStamp":1384788154772},{"x":145,"y":78,"timeStamp":1384788154782},{"x":143,"y":77,"timeStamp":1384788154813},{"x":141,"y":76,"timeStamp":1384788154821},{"x":140,"y":75,"timeStamp":1384788154847},{"x":138,"y":75,"timeStamp":1384788154862},{"x":137,"y":75,"timeStamp":1384788154879},{"x":136,"y":74,"timeStamp":1384788154896},{"x":135,"y":74,"timeStamp":1384788154912},{"x":133,"y":73,"timeStamp":1384788154930},{"x":133,"y":73,"timeStamp":1384788154946},{"x":133,"y":73,"timeStamp":1384788154963}]);
+      expect(onTransitionEnd).to.have.been.calledOnce;
+    });
+
+    it('triggers an event when resizing', function () {
+      var onResize = sinon.spy();
+      carousel.on('resize', onResize);
+      triggerResize(carousel, 480);
+      expect(onResize).to.have.been.calledOnce;
     });
   });
 })

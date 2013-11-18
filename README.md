@@ -76,6 +76,8 @@ Other options:
     page (by default it creates `<li>` elements with the `pageWidth` set inline
   * `pageWidth`: the number of pixels wide each page should be (default
     is `256`)
+  * `snap`: a boolean indicating if the carousel should always snap to
+    the closest page boundary at the end of a gesture (default `false`)
   * `template`: a function which returns a string containing html markup
     to construct the contents of the page. The function is passed two
     parameters `data` and `options`
@@ -104,6 +106,37 @@ flush all the buffer page queues so it that all carousels waiting for
 images to load will render their buffer pages immediately.  This will
 prevent any newly created Carousels from being stuck in the middle of
 the image queue.
+
+### Events
+
+Carousel.js provides the same event system as
+[Backbone.js](http://backbonejs.org/). The following are the current
+catalog of events that Carousel.js provides:
+
+  * `"crossboundary" (previous, current)` - whenever a page boundary is
+    crossed, provides the previous and current page details, page
+    details will be in this format:
+    ```javascript
+    {
+      page: pageNumberHere
+      dataIndex: dataIndexhere
+    }
+    ```
+  * `"imagesloaded" (imagesLoadedInstance)` - triggered whenver
+    `manageImages` is enabled and all visible images have loaded for a
+    carousel
+  * `"transitionend"` - whenever an animation completes
+  * `"resize" (eventDetails)` - whenever the carousel changes size in response to
+    an orientation change or window resize
+
+You can listen for any of these events using `on` or `once` as follows:
+
+```javascript
+carouselInstance.on("crossboundary", function(previous, current) {
+  console.log('previous page was', previous.page, 'current page is', current.page);
+  console.log('previous dataIndex was', previous.dataIndex, 'current dataIndex is', current.dataIndex);
+});
+```
 
 ## Testing
 
