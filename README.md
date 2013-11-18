@@ -65,6 +65,8 @@ Other options:
      carousel (`0.325` by default)
   * `delayBuffers`: will delay building of buffer pages, if you specify
     this parameter you will be required to call `renderBuffers` manually
+  * `initialDataIndex`: the data index to first place the carousel after
+    rendering (`0` by default)
   * `initialOffset`: the number of pixels to offset the initial position of
     the carousel (`0` by default)
   * `loop`: a boolean indicating whether the carousel should loop

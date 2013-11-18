@@ -41,6 +41,7 @@ var carouselOptions = [
   'data',
   'delayBuffers',
   'el',
+  'initialDataIndex',
   'initialOffset',
   'loop',
   'manageImages',
@@ -58,6 +59,7 @@ _.extend(Carousel.prototype, {
       animationDuration: 0.325,
       data: [],
       delayBuffers: false,
+      initialDataIndex: 0,
       loop: true,
       manageImages: false,
       pageWidth: 256,
@@ -260,6 +262,10 @@ _.extend(Carousel.prototype, {
       Carousel.prototype.visibleQueue.push(this);
       Carousel.prototype.bufferQueue.push(this);
       this.$el.imagesLoaded(this._imagesLoaded);
+    }
+
+    if (this.initialDataIndex !== 0) {
+      this.goToDataIndex(this.initialDataIndex);
     }
 
     return this;
