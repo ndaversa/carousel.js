@@ -116,12 +116,12 @@ catalog of events that Carousel.js provides:
   * `"crossboundary" (previous, current)` - whenever a page boundary is
     crossed, provides the previous and current page details, page
     details will be in this format:
-    ```javascript
+```javascript
     {
-      page: pageNumberHere
+      page: pageNumberHere,
       dataIndex: dataIndexhere
     }
-    ```
+```
   * `"imagesloaded" (imagesLoadedInstance)` - triggered whenver
     `manageImages` is enabled and all visible images have loaded for a
     carousel
