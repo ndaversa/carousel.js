@@ -107,6 +107,49 @@ images to load will render their buffer pages immediately.  This will
 prevent any newly created Carousels from being stuck in the middle of
 the image queue.
 
+### Methods
+
+The following methods are the only supported public facing methods:
+
+#### **render** `carousel.render()`
+Call this method when you are ready to insert the carousel instance into
+the DOM with the specified element (selector) provided upon construction.
+```javascript
+var carousel = new Carousel({
+  el: '#test',
+  pageWidth: 128,
+  data: [
+    { url: 'http://placehold.it/128x200/D5FBFF' },
+    { url: 'http://placehold.it/128x200/9FBCBF' },
+    { url: 'http://placehold.it/128x200/647678' },
+    { url: 'http://placehold.it/128x200/2F3738' },
+    { url: 'http://placehold.it/128x200/59D8E6' },
+  ],
+  template: function (data, options) {
+    if (data && data.url) {
+      return '<img src="' + data.url + '" />';
+    }
+    return '';
+  }
+});
+carousel.render();
+```
+
+#### **goToDataIndex** `carousel.goToDataIndex(index)`
+Provide the **index** in the `data` which you want to display
+```javascript
+carousel.goToDataIndex(3);
+```
+
+#### **flush** `Carousel.prototype.flush()`
+When the `manageImages` option has been used and you wish to stop
+waiting for visible images to be ready before building buffer pages.
+Calling `flush()` will render the buffer pages for all Carousel objects.
+
+```javascript
+Carousel.prototype.flush()
+```
+
 ### Events
 
 Carousel.js provides the same event system as

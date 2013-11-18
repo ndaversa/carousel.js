@@ -194,6 +194,20 @@ _.extend(Carousel.prototype, {
     this.renderBuffers(this.delayBuffers);
   },
 
+  goToDataIndex: function (index) {
+    if (index < 0 || index > (this.data.length - 1)) return;
+    this.current.x = index * -this.pageWidth;
+    this._enforceLimits();
+
+    this.next.page = Math.floor(-this.current.x / this.pageWidth) + this.pages.side;
+
+    this.slider.css({
+      transform: 'translate3d(' + this.current.x + 'px, 0, 0)',
+      transitionDuration: '0s'
+    });
+    this._transitionEnd();
+  },
+
   visibleQueue: [],
 
   bufferQueue: [],

@@ -667,6 +667,78 @@ describe('Carousel', function () {
           expect(carousel.page[8].x).to.equal(640);
         });
     });
+
+    describe('goToDataIndex', function () {
+        beforeEach(function () {
+          el = $('<div id="test" style="width: 320px;" />');
+          el.appendTo('body');
+          carousel = new Carousel({
+            loop: false,
+            el: '#test',
+            pageWidth: 128,
+            data: eleven
+          });
+          carousel.render();
+        });
+
+        afterEach(function () {
+          el.remove();
+        });
+
+        it('goes to a specified index (in the data)', function () {
+          expect(carousel.current.page).to.equal(3);
+          expect(carousel.page[carousel.current.page].dataIndex).to.equal(0);
+          carousel.goToDataIndex(2);
+          expect(carousel.current.page).to.equal(5);
+          expect(carousel.current.x).to.equal(-256);
+          expect(carousel.page[0].data).to.deep.equal({ content: '6' });
+          expect(carousel.page[1].data).to.deep.equal({ content: '7' });
+          expect(carousel.page[2].data).to.deep.equal({ content: '' });
+          expect(carousel.page[3].data).to.deep.equal({ content: '0' });
+          expect(carousel.page[4].data).to.deep.equal({ content: '1' });
+          expect(carousel.page[5].data).to.deep.equal({ content: '2' });
+          expect(carousel.page[6].data).to.deep.equal({ content: '3' });
+          expect(carousel.page[7].data).to.deep.equal({ content: '4' });
+          expect(carousel.page[8].data).to.deep.equal({ content: '5' });
+
+          expect(carousel.page[0].x).to.equal(768);
+          expect(carousel.page[1].x).to.equal(896);
+          expect(carousel.page[2].x).to.equal(-128);
+          expect(carousel.page[3].x).to.equal(0);
+          expect(carousel.page[4].x).to.equal(128);
+          expect(carousel.page[5].x).to.equal(256);
+          expect(carousel.page[6].x).to.equal(384);
+          expect(carousel.page[7].x).to.equal(512);
+          expect(carousel.page[8].x).to.equal(640);
+        });
+
+        it('does not exceed the carousel limits if the index is the last index', function () {
+          expect(carousel.current.page).to.equal(3);
+          expect(carousel.page[carousel.current.page].dataIndex).to.equal(0);
+          carousel.goToDataIndex(10);
+          expect(carousel.current.page).to.equal(11);
+          expect(carousel.current.x).to.equal(-1088);
+          expect(carousel.page[0].data).to.deep.equal({ content: '6' });
+          expect(carousel.page[1].data).to.deep.equal({ content: '7' });
+          expect(carousel.page[2].data).to.deep.equal({ content: '8' });
+          expect(carousel.page[3].data).to.deep.equal({ content: '9' });
+          expect(carousel.page[4].data).to.deep.equal({ content: '10' });
+          expect(carousel.page[5].data).to.deep.equal({ content: '' });
+          expect(carousel.page[6].data).to.deep.equal({ content: '' });
+          expect(carousel.page[7].data).to.deep.equal({ content: '' });
+          expect(carousel.page[8].data).to.deep.equal({ content: '5' });
+
+          expect(carousel.page[0].x).to.equal(768);
+          expect(carousel.page[1].x).to.equal(896);
+          expect(carousel.page[2].x).to.equal(1024);
+          expect(carousel.page[3].x).to.equal(1152);
+          expect(carousel.page[4].x).to.equal(1280);
+          expect(carousel.page[5].x).to.equal(1408);
+          expect(carousel.page[6].x).to.equal(1536);
+          expect(carousel.page[7].x).to.equal(1664);
+          expect(carousel.page[8].x).to.equal(640);
+        });
+    });
   });
 
   describe('momentum', function () {
