@@ -47,7 +47,9 @@ var carouselOptions = [
   'manageImages',
   'pageTemplate',
   'pageWidth',
+  'overscroll',
   'snap',
+  'snapNearest',
   'template',
   'templateOptions',
 ];
@@ -62,8 +64,10 @@ _.extend(Carousel.prototype, {
       initialDataIndex: 0,
       loop: true,
       manageImages: false,
+      overscroll: false,
       pageWidth: 256,
       snap: false,
+      snapNearest: false,
       templateOptions: {},
     };
     _.extend(this, carouselDefaults, _.pick(options, carouselOptions));
@@ -96,6 +100,10 @@ _.extend(Carousel.prototype, {
 
     if (this.manageImages) {
       this.delayBuffers = true;
+    }
+
+    if (this.snapNearest) {
+      this.snap = true;
     }
 
     this.rendered = false;
@@ -404,7 +412,7 @@ _.extend(Carousel.prototype, {
       sample = { percentage: 0.25 };
 
     //uncomment below to generate touch events used for simulation in tests
-    //console.log('_end, touches', JSON.stringify(this.touches));
+    // console.log('_end, touches', JSON.stringify(this.touches));
 
     sample.size = Math.ceil(this.touches.length * sample.percentage);
 
@@ -421,6 +429,12 @@ _.extend(Carousel.prototype, {
       sample.position = Math.ceil(sample.velocity * (d - d * d / (2 * d)));
 
       this.next.x += sample.position;
+    }
+
+    if (this.snapNearest) {
+      if (Math.abs(this.current.x - this.next.x) > this.pageWidth) {
+        this.next.x = this.current.x + (this.pageWidth * sample.direction);
+      }
     }
 
     if (this.snap || Math.abs(sample.velocity) > this.pageWidth * 6 ) { //significant momentum
@@ -464,7 +478,13 @@ _.extend(Carousel.prototype, {
     this.container.width = this.$el.width();
     if (!this.loop) {
       this.limit.left.x = 0;
-      this.limit.right.x = Math.min(this.data.length * -this.pageWidth + this.container.width, 0);
+
+      if (this.overscroll) {
+        this.limit.right.x = (this.data.length - 1) * -this.pageWidth;
+      }
+      else {
+        this.limit.right.x = Math.min(this.data.length * -this.pageWidth + this.container.width, 0);
+      }
     }
     else {
       this.limit.left.x = Infinity;

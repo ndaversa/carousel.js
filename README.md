@@ -74,12 +74,18 @@ Other options:
   * `manageImages`: a boolean indicating that images inside the carousel
     should be monitored, delaying buffer page construction until visible
     images are loaded. See additional notes on this behaviour.
+  * `overscroll`: a boolean indicating if the carousel should overscroll
+    the right bound to allow the final page to become the current active
+    page
   * `pageTemplate`: a function which returns a string containing html markup to construct the
     page (by default it creates `<li>` elements with the `pageWidth` set inline
   * `pageWidth`: the number of pixels wide each page should be (default
     is `256`)
   * `snap`: a boolean indicating if the carousel should always snap to
-    the closest page boundary at the end of a gesture (default `false`)
+    a page boundary at the end of a gesture (default `false`)
+  * `snapNearest`: a boolean indicating if the carousel should always snap to
+    the closest page boundary at the end of a gesture (default `false`).
+    Note this enables the `snap` option above implictly.
   * `template`: a function which returns a string containing html markup
     to construct the contents of the page. The function is passed two
     parameters `data` and `options`

@@ -1030,6 +1030,41 @@ describe('Carousel', function () {
         expect(carousel.crossBoundary).to.not.to.been.called;
       });
     });
+
+    describe('snap enabled with nearest neighbour', function () {
+      var el, carousel;
+
+      beforeEach(function () {
+        el = $('<div id="test" style="width: 320px;" />');
+        el.appendTo('body');
+        carousel = new Carousel({
+          el: '#test',
+          loop: false,
+          snapNearest: true,
+          data: eleven,
+          pageWidth:128
+        });
+        carousel.render();
+      });
+
+      afterEach(function () {
+        el.remove();
+      });
+
+      it('enables the snap option when snapNearest is specified', function () {
+        expect(carousel.snap).to.equal(true);
+      });
+
+      it('only snaps to the nearest neighbour, never further', function () {
+        sinon.spy(carousel, "crossBoundary");
+        expect(carousel.current.page).to.equal(3);
+        triggerTouches(carousel, [{"x":288,"page":0,"y":75,"timeStamp":1384968803654},{"x":279,"y":76,"timeStamp":1384968806145},{"x":266,"y":78,"timeStamp":1384968806161},{"x":247,"y":80,"timeStamp":1384968806178},{"x":224,"y":80,"timeStamp":1384968806195},{"x":192,"y":77,"timeStamp":1384968806212},{"x":153,"y":62,"timeStamp":1384968806229},{"x":135,"y":55,"timeStamp":1384968806259}]);
+        expect(carousel.current.page).to.equal(4);
+        expect(carousel.current.x).to.equal(-128);
+        expect(carousel.crossBoundary).to.have.been.calledOnce;
+        expect(carousel.crossBoundary).to.have.been.calledWith(3, 4);
+      });
+    });
   });
 
   describe('render sequence', function () {
@@ -1360,6 +1395,51 @@ describe('Carousel', function () {
       carousel.on('resize', onResize);
       triggerResize(carousel, 480);
       expect(onResize).to.have.been.calledOnce;
+    });
+  });
+
+  describe('overscroll for non-looping', function () {
+    var el, carousel;
+
+    beforeEach(function () {
+      el = $('<div id="test" style="width: 320px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        overscroll: true,
+        snapNearest: true,
+        data: five,
+        pageWidth:128
+      });
+      carousel.render();
+    });
+
+    afterEach(function () {
+      el.remove();
+    });
+
+    it('can reach the last page', function () {
+      sinon.spy(carousel, "crossBoundary");
+      expect(carousel.limit.right.x).to.equal(-512);
+      expect(carousel.current.page).to.equal(3);
+
+      triggerTouches(carousel, [{"x":279,"page":0,"y":444,"timeStamp":1384971219117},{"x":268,"y":444,"timeStamp":1384971219246},{"x":258,"y":444,"timeStamp":1384971219267},{"x":247,"y":444,"timeStamp":1384971219280},{"x":234,"y":444,"timeStamp":1384971219297},{"x":218,"y":444,"timeStamp":1384971219314},{"x":203,"y":444,"timeStamp":1384971219331},{"x":195,"y":444,"timeStamp":1384971219349},{"x":178,"y":443,"timeStamp":1384971219365},{"x":163,"y":441,"timeStamp":1384971219382},{"x":149,"y":438,"timeStamp":1384971219399}]);
+      expect(carousel.crossBoundary.callCount).to.equal(1);
+      expect(carousel.crossBoundary.getCall(0)).to.have.been.calledWith(3, 4);
+
+      triggerTouches(carousel, [{"x":296,"page":0,"y":451,"timeStamp":1384971220287},{"x":288,"y":452,"timeStamp":1384971220329},{"x":282,"y":452,"timeStamp":1384971220347},{"x":277,"y":452,"timeStamp":1384971220364},{"x":272,"y":452,"timeStamp":1384971220381},{"x":266,"y":452,"timeStamp":1384971220398},{"x":259,"y":452,"timeStamp":1384971220414},{"x":254,"y":452,"timeStamp":1384971220431},{"x":248,"y":452,"timeStamp":1384971220448},{"x":241,"y":452,"timeStamp":1384971220465},{"x":238,"y":452,"timeStamp":1384971220483},{"x":234,"y":452,"timeStamp":1384971220500},{"x":231,"y":452,"timeStamp":1384971220516},{"x":228,"y":452,"timeStamp":1384971220533},{"x":224,"y":452,"timeStamp":1384971220550},{"x":219,"y":452,"timeStamp":1384971220567},{"x":213,"y":452,"timeStamp":1384971220583},{"x":207,"y":452,"timeStamp":1384971220600},{"x":199,"y":452,"timeStamp":1384971220617},{"x":191,"y":452,"timeStamp":1384971220634},{"x":179,"y":452,"timeStamp":1384971220651},{"x":166,"y":451,"timeStamp":1384971220670},{"x":152,"y":450,"timeStamp":1384971220689}]);
+      expect(carousel.crossBoundary.callCount).to.equal(2);
+      expect(carousel.crossBoundary.getCall(1)).to.have.been.calledWith(4, 5);
+
+      triggerTouches(carousel, [{"x":262,"page":0,"y":452,"timeStamp":1384971221354},{"x":249,"y":452,"timeStamp":1384971221436},{"x":239,"y":452,"timeStamp":1384971221453},{"x":228,"y":452,"timeStamp":1384971221471},{"x":214,"y":452,"timeStamp":1384971221489},{"x":203,"y":452,"timeStamp":1384971221505},{"x":186,"y":452,"timeStamp":1384971221522},{"x":174,"y":452,"timeStamp":1384971221539},{"x":162,"y":451,"timeStamp":1384971221558},{"x":153,"y":451,"timeStamp":1384971221573}]);
+      expect(carousel.crossBoundary.callCount).to.equal(3);
+      expect(carousel.crossBoundary.getCall(2)).to.have.been.calledWith(5, 6);
+
+      triggerTouches(carousel, [{"x":240,"page":0,"y":447,"timeStamp":1384971222398},{"x":229,"y":447,"timeStamp":1384971222498},{"x":220,"y":447,"timeStamp":1384971222514},{"x":211,"y":447,"timeStamp":1384971222531},{"x":202,"y":447,"timeStamp":1384971222548},{"x":191,"y":447,"timeStamp":1384971222565},{"x":181,"y":447,"timeStamp":1384971222583},{"x":167,"y":446,"timeStamp":1384971222600},{"x":154,"y":445,"timeStamp":1384971222617},{"x":140,"y":443,"timeStamp":1384971222634},{"x":125,"y":442,"timeStamp":1384971222651},{"x":112,"y":439,"timeStamp":1384971222668},{"x":101,"y":437,"timeStamp":1384971222685},{"x":89,"y":435,"timeStamp":1384971222702},{"x":79,"y":432,"timeStamp":1384971222719}]);
+      expect(carousel.crossBoundary.callCount).to.equal(4);
+      expect(carousel.crossBoundary.getCall(3)).to.have.been.calledWith(6, 7);
+      expect(carousel.current.page).to.equal(7);
     });
   });
 })
