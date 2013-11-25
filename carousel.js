@@ -25,14 +25,6 @@ var dummyStyle = document.createElement('div').style,
 
 function Carousel(options) {
   options || (options = {});
-
-  this.container = {width: 0};
-  this.current = {x: 0, page:0};
-  this.limit = {left: {x: 0}, right: {x:0}};
-  this.next = {x: 0, page:0};
-  this.pages = {visible: 0, total: 0, buffer:0};
-  this.start = {x: 0, page:0};
-
   this._configure(options);
 }
 
@@ -55,6 +47,16 @@ var carouselOptions = [
 ];
 
 _.extend(Carousel.prototype, {
+
+  pageTemplate: function () {
+    return '<li style="width:' + this.pageWidth + 'px;"></li>';
+  },
+
+  template: function (data, options) {
+    data = data || {};
+    data.content = data.content || '';
+    return '' + data.content;
+  },
 
   _configure: function (options) {
     var carouselDefaults = {
@@ -84,15 +86,8 @@ _.extend(Carousel.prototype, {
 
     this.$el = $(this.el);
     this.el = this.$el[0];
-    this.slider = $('<ul class="slider"/>');
 
-    this._resize();
-
-    this.pages.side = Math.ceil(this.container.width / this.pageWidth);
-    this.pages.visible = _.range(this.pages.side, 2 * this.pages.side);
-    this.pages.total = this.pages.side * 3;
-
-    this.current.page = this.pages.side;
+    this.reset();
 
     if (this.initialOffset) {
       this.current.x = this.initialOffset;
@@ -109,23 +104,59 @@ _.extend(Carousel.prototype, {
     this.rendered = false;
   },
 
-  _imagesLoaded: function (instance) {
+  reset: function () {
     Carousel.prototype.visibleQueue = _.without(Carousel.prototype.visibleQueue, this);
 
-    if (Carousel.prototype.visibleQueue.length === 0) {
-      Carousel.prototype.flush();
+    this.container = {width: 0};
+    this.current = {x: 0, page: 0, data: 0};
+    this.limit = {left: {x: 0}, right: {x: 0}};
+    this.next = {x: 0, page: 0};
+    this.pages = {visible: 0, total: 0, buffer: 0};
+    this.start = {x: 0, page: 0};
+    this.rendered = false;
+    this.slider = $('<ul class="slider"/>');
+
+    this._resize();
+
+    this.pages.side = Math.ceil(this.container.width / this.pageWidth);
+    this.pages.visible = _.range(this.pages.side, 2 * this.pages.side);
+    this.pages.total = this.pages.side * 3;
+
+    this.current.page = this.pages.side;
+
+    this.slider
+    .off(startEvent, this._start)
+    .off(moveEvent, this._move)
+    .off(endEvent, this._end)
+    .off(cancelEvent, this._cancel);
+    $(window).off(resizeEvent, this._resize);
+  },
+
+  _resize: function (evt) {
+    this.container.width = this.$el.width();
+    if (!this.loop) {
+      this.limit.left.x = 0;
+
+      if (this.overscroll) {
+        this.limit.right.x = (this.data.length - 1) * -this.pageWidth;
+      }
+      else {
+        this.limit.right.x = Math.min(this.data.length * -this.pageWidth + this.container.width, 0);
+      }
     }
-    this.trigger('imagesloaded', instance);
-  },
+    else {
+      this.limit.left.x = Infinity;
+      this.limit.right.x = -Infinity;
+    }
 
-  pageTemplate: function () {
-    return '<li style="width:' + this.pageWidth + 'px;"></li>';
-  },
-
-  template: function (data, options) {
-    data = data || {};
-    data.content = data.content || '';
-    return '' + data.content;
+    if (this._enforceLimits()) {
+      this.slider.off(transitionEndEvent)
+      .css({
+        transform: 'translate3d(' + this.current.x + 'px, 0, 0)',
+        transitionDuration: '0s'
+      });
+    }
+    this.trigger('resize', evt);
   },
 
   initPages: function () {
@@ -219,6 +250,17 @@ _.extend(Carousel.prototype, {
     this._transitionEnd();
   },
 
+  add: function (data) {
+    var x = this.current.x;
+    this.data = _.union(this.data, data);
+
+    // This approach is heavy handed, should be rewritten to add data in-place
+    // without requiring a reset and re-render
+    this.reset();
+    this.current.x = x;
+    this.render();
+  },
+
   visibleQueue: [],
 
   bufferQueue: [],
@@ -231,6 +273,15 @@ _.extend(Carousel.prototype, {
     });
     Carousel.prototype.bufferQueue = [];
     Carousel.prototype.visibleQueue = [];
+  },
+
+  _imagesLoaded: function (instance) {
+    Carousel.prototype.visibleQueue = _.without(Carousel.prototype.visibleQueue, this);
+
+    if (Carousel.prototype.visibleQueue.length === 0) {
+      Carousel.prototype.flush();
+    }
+    this.trigger('imagesloaded', instance);
   },
 
   renderBuffers: function (withoutData) {
@@ -279,56 +330,45 @@ _.extend(Carousel.prototype, {
     return this;
   },
 
-  indexShift: function (current, amt, size) {
-    return (size + ((current + amt) % size)) % size;
+  dataIndex: function (current, increment) {
+    return (this.data.length + ((current + increment) % this.data.length)) % this.data.length;
   },
 
   crossBoundary: function (previous, current) {
     var rightMostPage = _.max(this.page, function(page) { return page.x; }),
         leftMostPage  = _.min(this.page, function(page) { return page.x; }),
-        previousData,
-        currentData   = this.indexShift(leftMostPage.dataIndex, this.pages.side, this.data.length),
-        nextRightData = this.indexShift(rightMostPage.dataIndex, 1, this.data.length),
-        nextLeftData  = this.indexShift(leftMostPage.dataIndex, -1, this.data.length);
+        direction = previous < current ? 1 : -1,
+        pageIn  = direction > 0 ? leftMostPage : rightMostPage,
+        pageOut = direction > 0 ? rightMostPage : leftMostPage,
+        nextData = this.dataIndex(pageOut.dataIndex, direction),
+        previousData = this.current.data;
 
-    if (previous < current) { //swiped to the left (show more on right)
-      if (this.loop || nextRightData > currentData) {
-        leftMostPage.data = this.data[nextRightData];
-      }
-      else {
-        leftMostPage.data = {};
-      }
-      leftMostPage.dataIndex = nextRightData;
-      leftMostPage.x = rightMostPage.x + this.pageWidth;
-      leftMostPage.$el
-        .css('left', leftMostPage.x + 'px')
-        .html(this.template(leftMostPage.data, this.templateOptions));
+    // Note: If we are not looping and pageOut.data is empty then we don't want
+    // the pageIn.data either because this would be appear as looping with a
+    // gap of one in certain situations
+    if (this.loop || !_(pageOut.data).isEmpty() &&
+     (direction === 1  && nextData > this.current.data) ||
+     (direction === -1 && nextData < this.current.data)) {
+        pageIn.data = this.data[nextData];
     }
-    else { //swiped to the right (show more on left)
-      if (this.loop || nextLeftData < currentData) {
-        rightMostPage.data = this.data[nextLeftData];
-      }
-      else {
-        rightMostPage.data = {};
-      }
-      rightMostPage.dataIndex = nextLeftData;
-      rightMostPage.x = leftMostPage.x - this.pageWidth;
-      rightMostPage.$el
-        .css('left', rightMostPage.x + 'px')
-        .html(this.template(rightMostPage.data, this.templateOptions));
+    else {
+      pageIn.data = {};
     }
+    pageIn.dataIndex = nextData;
+    pageIn.x = pageOut.x + (this.pageWidth * direction);
+    pageIn.$el
+      .css('left', pageIn.x + 'px')
+      .html(this.template(pageIn.data, this.templateOptions));
+
     this.current.page = current;
-
-    previousData = currentData;
-    leftMostPage = _.min(this.page, function(page) { return page.x; });
-    currentData  = this.indexShift(leftMostPage.dataIndex, this.pages.side, this.data.length);
+    this.current.data = this.dataIndex(this.current.data, direction);
 
     this.trigger('crossboundary', {
       page: previous,
       dataIndex: previousData
     },{
       page: current,
-      dataIndex: currentData
+      dataIndex: this.current.data
     });
   },
 
@@ -472,34 +512,8 @@ _.extend(Carousel.prototype, {
 
   _cancel: function (evt) {
     this._end(evt);
-  },
-
-  _resize: function (evt) {
-    this.container.width = this.$el.width();
-    if (!this.loop) {
-      this.limit.left.x = 0;
-
-      if (this.overscroll) {
-        this.limit.right.x = (this.data.length - 1) * -this.pageWidth;
-      }
-      else {
-        this.limit.right.x = Math.min(this.data.length * -this.pageWidth + this.container.width, 0);
-      }
-    }
-    else {
-      this.limit.left.x = Infinity;
-      this.limit.right.x = -Infinity;
-    }
-
-    if (this._enforceLimits()) {
-      this.slider.off(transitionEndEvent)
-      .css({
-        transform: 'translate3d(' + this.current.x + 'px, 0, 0)',
-        transitionDuration: '0s'
-      });
-    }
-    this.trigger('resize', evt);
   }
+
 });
 
 // Events API

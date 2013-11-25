@@ -1442,4 +1442,81 @@ describe('Carousel', function () {
       expect(carousel.current.page).to.equal(7);
     });
   });
+
+  describe('adding more data', function () {
+    var el, carousel;
+
+    beforeEach(function () {
+      el = $('<div id="test" style="width: 320px;" />');
+      el.appendTo('body');
+      carousel = new Carousel({
+        el: '#test',
+        loop: false,
+        data: five,
+        pageWidth:128
+      });
+      carousel.render();
+    });
+
+    afterEach(function () {
+      el.remove();
+    });
+
+    it('appends new data to the end of the array', function () {
+      expect(carousel.data).to.deep.equal([
+        { content: '0' },
+        { content: '1' },
+        { content: '2' },
+        { content: '3' },
+        { content: '4' },
+      ]);
+
+      carousel.add(eleven);
+
+      expect(carousel.data).to.deep.equal([
+        { content: '0' },
+        { content: '1' },
+        { content: '2' },
+        { content: '3' },
+        { content: '4' },
+        { content: '0' },
+        { content: '1' },
+        { content: '2' },
+        { content: '3' },
+        { content: '4' },
+        { content: '5' },
+        { content: '6' },
+        { content: '7' },
+        { content: '8' },
+        { content: '9' },
+        { content: '10' },
+      ]);
+    });
+
+    it('does not append the same data twice', function () {
+      expect(carousel.data).to.deep.equal([
+        { content: '0' },
+        { content: '1' },
+        { content: '2' },
+        { content: '3' },
+        { content: '4' },
+      ]);
+
+      carousel.add(five);
+
+      expect(carousel.data).to.deep.equal([
+        { content: '0' },
+        { content: '1' },
+        { content: '2' },
+        { content: '3' },
+        { content: '4' },
+      ]);
+    });
+
+    it('resizes after appending new data', function () {
+      expect(carousel.limit).to.deep.equal({ left: { x: 0 }, right: { x: -320 } });
+      carousel.add(eleven);
+      expect(carousel.limit).to.deep.equal({ left: { x: 0 }, right: { x: -1728 } });
+    });
+  });
 })
