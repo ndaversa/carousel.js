@@ -48,15 +48,103 @@ var carouselOptions = [
 
 _.extend(Carousel.prototype, {
 
+// ---------------------------------------------------------------------------
+// Public Methods
+
+  render: function () {
+    this._initPages();
+    this._initSlider();
+    this._renderPages();
+
+    this.$el.css({
+      position: 'relative',
+      overflow: 'hidden'
+    }).html(this.slider);
+
+    if (this.manageImages) {
+      Carousel.prototype._visibleQueue.push(this);
+      Carousel.prototype._bufferQueue.push(this);
+      this.$el.imagesLoaded(this._imagesLoaded);
+    }
+
+    if (this.initialDataIndex !== 0) {
+      this.goToDataIndex(this.initialDataIndex);
+    }
+
+    return this;
+  },
+
+  renderBuffers: function (withoutData) {
+    if (this.rendered) return;
+    var right = (this.current.page + this.pages.visible.length),
+      left = 0;
+
+    for (; right<this.page.length; right++) {
+      if (!withoutData) {
+        this.page[right].$el.html(this.template(this.page[right].data, this.templateOptions));
+      }
+      this.slider.append(this.page[right].$el);
+    }
+
+    for (; left<this.current.page; left++) {
+      if (!withoutData) {
+        this.page[left].$el.html(this.template(this.page[left].data, this.templateOptions));
+      }
+      this.slider.append(this.page[left].$el);
+    }
+
+    if (!withoutData) {
+      this.rendered = true;
+    }
+  },
+
   pageTemplate: function () {
     return '<li style="width:' + this.pageWidth + 'px;"></li>';
   },
 
   template: function (data, options) {
-    data = data || {};
-    data.content = data.content || '';
-    return '' + data.content;
+    return data;
   },
+
+  goToDataIndex: function (index, options) {
+    if (index < 0 || index > (this.data.length - 1)) return;
+    if (!this.rendered) this.renderBuffers();
+    this.current.x = index * -this.pageWidth;
+    this._enforceLimits();
+
+    this.next.page = Math.floor(-this.current.x / this.pageWidth) + this.pages.side;
+
+    this.slider.css({
+      transform: 'translate3d(' + this.current.x + 'px, 0, 0)',
+      transitionDuration: '0s'
+    });
+    this._transitionEnd();
+  },
+
+
+  add: function (data) {
+    var current = this.current;
+
+    this.silent = true;
+    this.goToDataIndex(current.data);
+    this.data = _.union(this.data, data);
+    this._resize();
+    this._updatePages();
+    this.silent = false;
+  },
+
+  flush: function () {
+    _(Carousel.prototype._bufferQueue).each(function (carousel) {
+      _.delay(function () {
+        if (!carousel.rendered) carousel.renderBuffers.call(carousel);
+      }, 0);
+    });
+    Carousel.prototype._bufferQueue = [];
+    Carousel.prototype._visibleQueue = [];
+  },
+
+// ---------------------------------------------------------------------------
+// Private Methods
 
   _configure: function (options) {
     var carouselDefaults = {
@@ -74,7 +162,7 @@ _.extend(Carousel.prototype, {
     };
     _.extend(this, carouselDefaults, _.pick(options, carouselOptions));
     _.bindAll(this,
-      'crossBoundary',
+      '_crossBoundary',
       '_start',
       '_move',
       '_end',
@@ -87,7 +175,7 @@ _.extend(Carousel.prototype, {
     this.$el = $(this.el);
     this.el = this.$el[0];
 
-    this.reset();
+    this._reset();
 
     if (this.initialOffset) {
       this.current.x = this.initialOffset;
@@ -104,8 +192,8 @@ _.extend(Carousel.prototype, {
     this.rendered = false;
   },
 
-  reset: function () {
-    Carousel.prototype.visibleQueue = _.without(Carousel.prototype.visibleQueue, this);
+  _reset: function () {
+    Carousel.prototype._visibleQueue = _.without(Carousel.prototype._visibleQueue, this);
 
     this.container = {width: 0};
     this.current = {x: 0, page: 0, data: 0};
@@ -114,6 +202,7 @@ _.extend(Carousel.prototype, {
     this.pages = {visible: 0, total: 0, buffer: 0};
     this.start = {x: 0, page: 0};
     this.rendered = false;
+    this.silent = false;
     this.slider = $('<ul class="slider"/>');
 
     this._resize();
@@ -156,17 +245,17 @@ _.extend(Carousel.prototype, {
         transitionDuration: '0s'
       });
     }
-    this.trigger('resize', evt);
+    if(!this.silent) this.trigger('resize', evt);
   },
 
-  initPages: function () {
+  _initPages: function () {
     var dataIndex = this.data.length - 1;
 
     this.page = new Array(this.pages.total);
 
     // Build left buffer pages
     for (var i=this.current.page-1; i>=0; i--) {
-      var data = this.loop ? this.data[dataIndex] : {},
+      var data = this.loop ? this.data[dataIndex] : '',
         x = (i - this.pages.side) * this.pageWidth;
 
       this.page[i] = {
@@ -188,7 +277,7 @@ _.extend(Carousel.prototype, {
         x = (i - this.pages.side) * this.pageWidth;
 
       if (!this.loop && (i - this.current.page) > (this.data.length - 1) ) {
-        data = {};
+        data = '';
       }
       else {
         data = this.data[dataIndex];
@@ -208,7 +297,7 @@ _.extend(Carousel.prototype, {
     }
   },
 
-  initSlider: function () {
+  _initSlider: function () {
     this.slider.css({
       position: 'relative',
       top: '0px',
@@ -226,7 +315,7 @@ _.extend(Carousel.prototype, {
     $(window).on(resizeEvent, this._resize);
   },
 
-  renderPages: function () {
+  _renderPages: function () {
     _(this.pages.visible).each(function (i) {
       this.page[i].$el.html(this.template(this.page[i].data, this.templateOptions));
       this.slider.append(this.page[i].$el);
@@ -235,124 +324,87 @@ _.extend(Carousel.prototype, {
     this.renderBuffers(this.delayBuffers);
   },
 
-  goToDataIndex: function (index) {
-    if (index < 0 || index > (this.data.length - 1)) return;
-    if (!this.rendered) this.renderBuffers();
-    this.current.x = index * -this.pageWidth;
-    this._enforceLimits();
+  _updatePages: function () {
+    var blanking = false;
 
-    this.next.page = Math.floor(-this.current.x / this.pageWidth) + this.pages.side;
+    // Update left buffer pages
+    for (var i=1; i <= this.pages.side; i++) {
+      var pageIndex = (this.current.page + this.page.length - i) % this.page.length,
+          dataIndex = (this.current.data + this.data.length - i) % this.data.length;
+      if (this.page[pageIndex].dataIndex !== dataIndex) {
+        this.page[pageIndex].dataIndex = dataIndex;
+        if (this.loop || dataIndex <= this.current.data && !blanking) {
+          this.page[pageIndex].data = this.data[dataIndex];
+        }
+        else {
+          this.page[pageIndex].data = '';
+        }
+        this.page[pageIndex].$el.html(this.template(this.page[pageIndex].data, this.templateOptions));
+      }
 
-    this.slider.css({
-      transform: 'translate3d(' + this.current.x + 'px, 0, 0)',
-      transitionDuration: '0s'
-    });
-    this._transitionEnd();
+      if (this.page[pageIndex].data === '') {
+        blanking = true;
+      }
+    }
+
+    // Update visible + right buffer pages
+    blanking = false;
+    for (var i=0; i < this.pages.side*2; i++) {
+      var pageIndex = (this.current.page + i) % this.page.length,
+          dataIndex = (this.current.data + i) % this.data.length;
+      if (this.page[pageIndex].dataIndex !== dataIndex) {
+        this.page[pageIndex].dataIndex = dataIndex;
+        if (this.loop || dataIndex >= this.current.data && !blanking) {
+          this.page[pageIndex].data = this.data[dataIndex];
+        }
+        else {
+          this.page[pageIndex].data = '';
+        }
+        this.page[pageIndex].$el.html(this.template(this.page[pageIndex].data, this.templateOptions));
+      }
+
+      if (this.page[pageIndex].data === '') {
+        blanking = true;
+      }
+    }
   },
 
-  add: function (data) {
-    var x = this.current.x;
-    this.data = _.union(this.data, data);
+  _visibleQueue: [],
 
-    // This approach is heavy handed, should be rewritten to add data in-place
-    // without requiring a reset and re-render
-    this.reset();
-    this.current.x = x;
-    this.render();
-  },
-
-  visibleQueue: [],
-
-  bufferQueue: [],
-
-  flush: function () {
-    _(Carousel.prototype.bufferQueue).each(function (carousel) {
-      _.delay(function () {
-        if (!carousel.rendered) carousel.renderBuffers.call(carousel);
-      }, 0);
-    });
-    Carousel.prototype.bufferQueue = [];
-    Carousel.prototype.visibleQueue = [];
-  },
+  _bufferQueue: [],
 
   _imagesLoaded: function (instance) {
-    Carousel.prototype.visibleQueue = _.without(Carousel.prototype.visibleQueue, this);
+    Carousel.prototype._visibleQueue = _.without(Carousel.prototype._visibleQueue, this);
 
-    if (Carousel.prototype.visibleQueue.length === 0) {
+    if (Carousel.prototype._visibleQueue.length === 0) {
       Carousel.prototype.flush();
     }
     this.trigger('imagesloaded', instance);
   },
 
-  renderBuffers: function (withoutData) {
-    var right = (this.current.page + this.pages.visible.length),
-      left = 0;
-
-    for (; right<this.page.length; right++) {
-      if (!withoutData) {
-        this.page[right].$el.html(this.template(this.page[right].data, this.templateOptions));
-      }
-      this.slider.append(this.page[right].$el);
-    }
-
-    for (; left<this.current.page; left++) {
-      if (!withoutData) {
-        this.page[left].$el.html(this.template(this.page[left].data, this.templateOptions));
-      }
-      this.slider.append(this.page[left].$el);
-    }
-
-    if (!withoutData) {
-      this.rendered = true;
-    }
-  },
-
-  render: function () {
-    this.initPages();
-    this.initSlider();
-    this.renderPages();
-
-    this.$el.css({
-      position: 'relative',
-      overflow: 'hidden'
-    }).html(this.slider);
-
-    if (this.manageImages) {
-      Carousel.prototype.visibleQueue.push(this);
-      Carousel.prototype.bufferQueue.push(this);
-      this.$el.imagesLoaded(this._imagesLoaded);
-    }
-
-    if (this.initialDataIndex !== 0) {
-      this.goToDataIndex(this.initialDataIndex);
-    }
-
-    return this;
-  },
-
-  dataIndex: function (current, increment) {
+  _dataIndex: function (current, increment) {
     return (this.data.length + ((current + increment) % this.data.length)) % this.data.length;
   },
 
-  crossBoundary: function (previous, current) {
+  _crossBoundary: function (previous, current) {
     var rightMostPage = _.max(this.page, function(page) { return page.x; }),
         leftMostPage  = _.min(this.page, function(page) { return page.x; }),
         direction = previous < current ? 1 : -1,
         pageIn  = direction > 0 ? leftMostPage : rightMostPage,
         pageOut = direction > 0 ? rightMostPage : leftMostPage,
-        nextData = this.dataIndex(pageOut.dataIndex, direction),
+        nextData = this._dataIndex(pageOut.dataIndex, direction),
         previousData = this.current.data;
 
     // Note: If we are not looping and pageOut.data is empty then we don't want
     // the pageIn.data either because this would be appear as looping with a
     // gap of one in certain situations
-    if (this.loop || !_(pageOut.data).isEmpty() &&
+    if (this.loop || pageOut.data !== '' &&
      (direction === 1  && nextData > this.current.data) ||
      (direction === -1 && nextData < this.current.data)) {
         pageIn.data = this.data[nextData];
     }
     else {
-      pageIn.data = {};
+      pageIn.data = '';
     }
     pageIn.dataIndex = nextData;
     pageIn.x = pageOut.x + (this.pageWidth * direction);
@@ -361,15 +413,17 @@ _.extend(Carousel.prototype, {
       .html(this.template(pageIn.data, this.templateOptions));
 
     this.current.page = current;
-    this.current.data = this.dataIndex(this.current.data, direction);
+    this.current.data = this._dataIndex(this.current.data, direction);
 
-    this.trigger('crossboundary', {
-      page: previous,
-      dataIndex: previousData
-    },{
-      page: current,
-      dataIndex: this.current.data
-    });
+    if (!this.silent) {
+        this.trigger('crossboundary', {
+        page: previous,
+        dataIndex: previousData
+      },{
+        page: current,
+        dataIndex: this.current.data
+      });
+    }
   },
 
   _enforceLimits: function () {
@@ -501,19 +555,18 @@ _.extend(Carousel.prototype, {
     var delta = Math.abs(this.next.page - this.current.page);
     for (var i=0; i < delta; i++) {
       if (this.next.page > this.current.page) {
-        this.crossBoundary(this.current.page, this.current.page + 1);
+        this._crossBoundary(this.current.page, this.current.page + 1);
       }
       else {
-        this.crossBoundary(this.current.page, this.current.page - 1);
+        this._crossBoundary(this.current.page, this.current.page - 1);
       }
     }
-    this.trigger('transitionend');
+    if (!this.silent) this.trigger('transitionend');
   },
 
   _cancel: function (evt) {
     this._end(evt);
   }
-
 });
 
 // Events API

@@ -143,10 +143,28 @@ var carousel = new Carousel({
 carousel.render();
 ```
 
+#### **renderBuffers** `carousel.renderBuffers()`
+This method should only be called when using the `delayBuffers` option
+to indicate explicitly define when buffers should be rendered. This
+method should **not** be called when using `manageImages` as it will be
+called automatically when visible images are loaded.
+
 #### **goToDataIndex** `carousel.goToDataIndex(index)`
 Provide the **index** in the `data` which you want to display
 ```javascript
 carousel.goToDataIndex(3);
+```
+
+#### **add** `carousel.add(data)`
+Provide additional `data` to the Carousel. The `data` should be an
+array. Note that a union of data is performed so that only new data is
+appended to the end of existing data.
+```javascript
+carousel.add([
+  { url: 'http://placehold.it/128x200/85DB18' },
+  { url: 'http://placehold.it/128x200/CDE855' },
+  { url: 'http://placehold.it/128x200/F5F6D4' },
+]);
 ```
 
 #### **flush** `Carousel.prototype.flush()`
