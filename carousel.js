@@ -123,15 +123,15 @@ _.extend(Carousel.prototype, {
 
 
   add: function (data) {
-    var x = this.current.x;
-
-    this.silent = true;
-    this.goToDataIndex(this.current.data);
-    this.current.x += x % this.pageWidth; //preserve the offset from before
-    this.data = _.union(this.data, data);
-    this._resize();
-    this._updatePages();
-    this.silent = false;
+    var _this = this;
+    if (this.animating || this.initiated) {
+      this.once('transitionend', function () {
+        this._add(data);
+      });
+    }
+    else {
+      this._add(data);
+    }
   },
 
   flush: function () {
@@ -223,6 +223,7 @@ _.extend(Carousel.prototype, {
   },
 
   _resize: function (evt) {
+    evt = evt || {};
     this.container.width = this.$el.width();
     if (!this.loop) {
       this.limit.left.x = 0;
@@ -239,7 +240,7 @@ _.extend(Carousel.prototype, {
       this.limit.right.x = -Infinity;
     }
 
-    if (this._enforceLimits()) {
+    if (this._enforceLimits() || evt.force) {
       this.slider.off(transitionEndEvent)
       .css({
         transform: 'translate3d(' + this.current.x + 'px, 0, 0)',
@@ -368,6 +369,18 @@ _.extend(Carousel.prototype, {
         blanking = true;
       }
     }
+  },
+
+  _add: function (data) {
+    var x = this.current.x;
+
+    this.silent = true;
+    this.goToDataIndex(this.current.data);
+    this.current.x += x % this.pageWidth; //preserve the offset from before
+    this.data = _.union(this.data, data);
+    this._resize({force: true});
+    this._updatePages();
+    this.silent = false;
   },
 
   _visibleQueue: [],
