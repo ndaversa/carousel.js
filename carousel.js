@@ -550,7 +550,9 @@ _.extend(Carousel.prototype, {
     this.animating = true;
   },
 
-  _transitionEnd: function () {
+  _transitionEnd: function (evt) {
+    if (evt) evt.stopPropagation();
+
     this.animating = false;
     var delta = Math.abs(this.next.page - this.current.page);
     for (var i=0; i < delta; i++) {
