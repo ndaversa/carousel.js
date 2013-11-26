@@ -123,10 +123,11 @@ _.extend(Carousel.prototype, {
 
 
   add: function (data) {
-    var current = this.current;
+    var x = this.current.x;
 
     this.silent = true;
-    this.goToDataIndex(current.data);
+    this.goToDataIndex(this.current.data);
+    this.current.x += x % this.pageWidth; //preserve the offset from before
     this.data = _.union(this.data, data);
     this._resize();
     this._updatePages();

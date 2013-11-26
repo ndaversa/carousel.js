@@ -1561,6 +1561,40 @@ describe('Carousel', function () {
           expect(carousel.page[8].x).to.equal(640);
         });
       });
+
+      describe('when not snapping', function () {
+        var el, carousel;
+
+        beforeEach(function () {
+          el = $('<div id="test" style="width: 320px;" />');
+          el.appendTo('body');
+          carousel = new Carousel({
+            loop: false,
+            el: '#test',
+            data: five,
+            pageWidth:128
+          });
+          carousel.render();
+        });
+
+        afterEach(function () {
+          el.remove();
+        });
+
+        it('preserves the offset from the boundary when adding more data', function () {
+          triggerTouches(carousel, [{"x":289,"page":0,"y":110,"timeStamp":1385497072122},{"x":282,"y":110,"timeStamp":1385497072235},{"x":277,"y":110,"timeStamp":1385497072253},{"x":272,"y":110,"timeStamp":1385497072269},{"x":259,"y":110,"timeStamp":1385497072317},{"x":254,"y":110,"timeStamp":1385497072334},{"x":249,"y":110,"timeStamp":1385497072349},{"x":245,"y":110,"timeStamp":1385497072367},{"x":240,"y":110,"timeStamp":1385497072383},{"x":235,"y":110,"timeStamp":1385497072400},{"x":231,"y":109,"timeStamp":1385497072417},{"x":224,"y":108,"timeStamp":1385497072434},{"x":217,"y":106,"timeStamp":1385497072450},{"x":214,"y":105,"timeStamp":1385497072467},{"x":209,"y":104,"timeStamp":1385497072484},{"x":205,"y":103,"timeStamp":1385497072500},{"x":203,"y":103,"timeStamp":1385497072517},{"x":200,"y":102,"timeStamp":1385497072534},{"x":197,"y":101,"timeStamp":1385497072550},{"x":195,"y":101,"timeStamp":1385497072567},{"x":192,"y":101,"timeStamp":1385497072584},{"x":189,"y":100,"timeStamp":1385497072601},{"x":187,"y":99,"timeStamp":1385497072619},{"x":184,"y":99,"timeStamp":1385497072633},{"x":180,"y":98,"timeStamp":1385497072651},{"x":176,"y":97,"timeStamp":1385497072667},{"x":173,"y":96,"timeStamp":1385497072683},{"x":170,"y":96,"timeStamp":1385497072700},{"x":167,"y":96,"timeStamp":1385497072717},{"x":166,"y":95,"timeStamp":1385497072734},{"x":164,"y":95,"timeStamp":1385497072751},{"x":163,"y":95,"timeStamp":1385497072768},{"x":161,"y":95,"timeStamp":1385497072783},{"x":160,"y":94,"timeStamp":1385497072800},{"x":159,"y":94,"timeStamp":1385497072817},{"x":157,"y":94,"timeStamp":1385497072835},{"x":154,"y":94,"timeStamp":1385497072850},{"x":152,"y":94,"timeStamp":1385497072868},{"x":151,"y":94,"timeStamp":1385497072885},{"x":147,"y":94,"timeStamp":1385497072902},{"x":146,"y":93,"timeStamp":1385497072918},{"x":144,"y":93,"timeStamp":1385497072935},{"x":143,"y":93,"timeStamp":1385497072952},{"x":142,"y":92,"timeStamp":1385497072969}]);
+          expect(carousel.current.x).to.equal(-164);
+          expect(carousel.current.data).to.equal(1);
+          expect(carousel.current.page).to.equal(4);
+          expect(carousel.page.length).to.equal(9);
+
+          carousel.add(elevenLetters);
+          expect(carousel.current.x).to.equal(-164);
+          expect(carousel.current.data).to.equal(1);
+          expect(carousel.current.page).to.equal(4);
+          expect(carousel.page.length).to.equal(9);
+        });
+      });
     });
   });
 })
