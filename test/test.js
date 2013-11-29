@@ -184,23 +184,21 @@ describe('Carousel', function () {
     });
 
     it('correctly renders after instantiation', function () {
-      var parentProps = ['overflow', 'position'],
-        sliderProps = ['top', 'height', 'width', 'transitionDuration', 'transitionTimingFunction', 'transform'],
+      var parentProps = ['overflow'],
+        sliderProps = ['position', 'height', 'transitionDuration', 'transitionTimingFunction', 'transform'],
         styles;
 
       carousel.render();
 
       styles = pick(carousel.el.style, parentProps);
       expect(styles).to.deep.equal({
-        overflow: 'hidden',
-        position: 'relative'
+        overflow: 'hidden'
       });
 
       styles = pick(carousel.$el.children().first()[0].style, sliderProps);
       expect(styles).to.deep.equal({
-        top: '0px',
+        position: 'relative',
         height: '100%',
-        width: '100%',
         transitionDuration: '0s',
         transitionTimingFunction: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
         transform: 'translate3d(0px, 0px, 0px)'

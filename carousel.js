@@ -57,7 +57,6 @@ _.extend(Carousel.prototype, {
     this._renderPages();
 
     this.$el.css({
-      position: 'relative',
       overflow: 'hidden'
     }).html(this.slider);
 
@@ -302,9 +301,7 @@ _.extend(Carousel.prototype, {
   _initSlider: function () {
     this.slider.css({
       position: 'relative',
-      top: '0px',
       height: '100%',
-      width: '100%',
       transitionDuration: '0s',
       transitionTimingFunction: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
       transform: 'translate3d(' + this.current.x + 'px, 0px, 0px)'
