@@ -1050,17 +1050,7 @@ describe('Carousel', function () {
       expect(carousel.page.length).to.equal(9);
       expect(carousel.pages.visible.length).to.equal(3);
       expect(carousel.pages.visible).to.deep.equal([3, 4, 5]);
-      expect(carousel.slider.append.callCount).to.equal(9);
-
-      expect(carousel.slider.append.getCall(0)).to.have.been.calledWith(carousel.page[3].$el);
-      expect(carousel.slider.append.getCall(1)).to.have.been.calledWith(carousel.page[4].$el);
-      expect(carousel.slider.append.getCall(2)).to.have.been.calledWith(carousel.page[5].$el);
-      expect(carousel.slider.append.getCall(3)).to.have.been.calledWith(carousel.page[6].$el);
-      expect(carousel.slider.append.getCall(4)).to.have.been.calledWith(carousel.page[7].$el);
-      expect(carousel.slider.append.getCall(5)).to.have.been.calledWith(carousel.page[8].$el);
-      expect(carousel.slider.append.getCall(6)).to.have.been.calledWith(carousel.page[0].$el);
-      expect(carousel.slider.append.getCall(7)).to.have.been.calledWith(carousel.page[1].$el);
-      expect(carousel.slider.append.getCall(8)).to.have.been.calledWith(carousel.page[2].$el);
+      expect(carousel.slider.append.callCount).to.equal(2);
 
       el.remove();
     });
@@ -1082,7 +1072,7 @@ describe('Carousel', function () {
       expect(carousel.page.length).to.equal(9);
       expect(carousel.pages.visible.length).to.equal(3);
       expect(carousel.pages.visible).to.deep.equal([3, 4, 5]);
-      expect(carousel.slider.append.callCount).to.equal(9);
+      expect(carousel.slider.append.callCount).to.equal(2);
       expect(carousel.template.callCount).to.equal(3);
 
       expect(carousel.template.getCall(0).calledWith('0')).to.be.ok;

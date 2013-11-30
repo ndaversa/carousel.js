@@ -76,22 +76,24 @@ _.extend(Carousel.prototype, {
   renderBuffers: function (withoutData) {
     if (this.rendered) return;
     var right = (this.current.page + this.pages.visible.length),
-      left = 0;
+      left = 0,
+      fragment = document.createDocumentFragment();
 
     for (; right<this.page.length; right++) {
       if (!withoutData) {
         this.page[right].$el.html(this.template(this.page[right].data, this.templateOptions));
       }
-      this.slider.append(this.page[right].$el);
+      fragment.appendChild(this.page[right].$el[0]);
     }
 
     for (; left<this.current.page; left++) {
       if (!withoutData) {
         this.page[left].$el.html(this.template(this.page[left].data, this.templateOptions));
       }
-      this.slider.append(this.page[left].$el);
+      fragment.appendChild(this.page[left].$el[0]);
     }
 
+    this.slider.append(fragment);
     if (!withoutData) {
       this.rendered = true;
     }
@@ -315,10 +317,12 @@ _.extend(Carousel.prototype, {
   },
 
   _renderPages: function () {
+    var fragment = document.createDocumentFragment();
     _(this.pages.visible).each(function (i) {
       this.page[i].$el.html(this.template(this.page[i].data, this.templateOptions));
-      this.slider.append(this.page[i].$el);
+      fragment.appendChild(this.page[i].$el[0]);
     }, this);
+    this.slider.append(fragment);
 
     this.renderBuffers(this.delayBuffers);
   },
