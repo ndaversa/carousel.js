@@ -420,6 +420,11 @@ _.extend(Carousel.prototype, {
       .css('left', pageIn.x + 'px')
       .html(this.template(pageIn.data, this.templateOptions));
 
+    this.current.width = (Math.abs(current) + this.pages.visible.length) * this.pageWidth;
+    this.slider.css({
+      width: this.current.width + 'px'
+    });
+
     this.current.page = current;
     this.current.data = this._dataIndex(this.current.data, direction);
 
