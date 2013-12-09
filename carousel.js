@@ -56,9 +56,13 @@ _.extend(Carousel.prototype, {
     this._initSlider();
     this._renderPages();
 
-    this.$el.css({
-      overflow: 'hidden'
-    }).html(this.slider);
+    this.$el
+    .css({ overflow: 'hidden' })
+    .html(this.slider)
+    .on(startEvent, this._start)
+    .on(moveEvent, this._move)
+    .on(endEvent, this._end)
+    .on(cancelEvent, this._cancel);
 
     if (this.manageImages) {
       Carousel.prototype._visibleQueue.push(this);
@@ -214,13 +218,6 @@ _.extend(Carousel.prototype, {
     this.pages.total = this.pages.side * 3;
 
     this.current.page = this.pages.side;
-
-    this.slider
-    .off(startEvent, this._start)
-    .off(moveEvent, this._move)
-    .off(endEvent, this._end)
-    .off(cancelEvent, this._cancel);
-    $(window).off(resizeEvent, this._resize);
   },
 
   _resize: function (evt) {
@@ -307,11 +304,7 @@ _.extend(Carousel.prototype, {
       transitionDuration: '0s',
       transitionTimingFunction: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
       transform: 'translate3d(' + this.current.x + 'px, 0px, 0px)'
-    })
-    .on(startEvent, this._start)
-    .on(moveEvent, this._move)
-    .on(endEvent, this._end)
-    .on(cancelEvent, this._cancel);
+    });
 
     $(window).on(resizeEvent, this._resize);
   },
