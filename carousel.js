@@ -201,7 +201,7 @@ _.extend(Carousel.prototype, {
   _reset: function () {
     Carousel.prototype._visibleQueue = _.without(Carousel.prototype._visibleQueue, this);
 
-    this.container = {width: 0};
+    this.container = {width: this.pageWidth};
     this.current = {x: 0, page: 0, data: 0};
     this.limit = {left: {x: 0}, right: {x: 0}};
     this.next = {x: 0, page: 0};
