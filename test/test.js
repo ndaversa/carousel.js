@@ -168,7 +168,7 @@ describe('Carousel', function () {
     var el, carousel;
 
     beforeEach(function () {
-      el = $('<div id="test" />');
+      el = $('<div id="test" style="width:0" />');
       el.appendTo('body');
       carousel = new Carousel({
         el: '#test'
@@ -203,6 +203,10 @@ describe('Carousel', function () {
         transitionTimingFunction: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
         transform: 'translate3d(0px, 0px, 0px)'
       });
+    });
+
+    it('fallbacks to the pageWidth for the container when the element has zero width', function () {
+      expect(carousel.container.width).to.equal(320);
     });
   });
 
