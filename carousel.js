@@ -11,6 +11,7 @@
 
 var dummyStyle = document.createElement('div').style,
   hasTouch = 'ontouchstart' in window,
+  isBadAndroid = /Android/.test(window.navigator.appVersion) && !(/Chrome\/\d/.test(window.navigator.appVersion)),
 
   // Events
   resizeEvent = 'onorientationchange' in window ? 'orientationchange' : 'resize',
@@ -154,7 +155,7 @@ _.extend(Carousel.prototype, {
 
   _configure: function (options) {
     var carouselDefaults = {
-      animationDuration: 0.325,
+      animationDuration: isBadAndroid ? 0.01 : 0.325,
       data: [],
       delayBuffers: false,
       initialDataIndex: 0,
