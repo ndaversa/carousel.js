@@ -487,8 +487,8 @@ _.extend(Carousel.prototype, {
 
     if (this.animating) this._transitionEnd(); //cleanup running animation
 
-    //Wait for 10 pixel movement before beginning animations
-    if (this.steps.x < 10 && this.steps.y < 10) {
+    //Wait for 5 pixel movement before beginning animations
+    if (this.steps.x < 5 && this.steps.y < 5) {
       return;
     }
 
