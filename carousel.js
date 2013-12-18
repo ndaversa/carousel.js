@@ -155,7 +155,7 @@ _.extend(Carousel.prototype, {
 
   _configure: function (options) {
     var carouselDefaults = {
-      animationDuration: isBadAndroid ? 0.01 : 0.325,
+      animationDuration: 0.325,
       data: [],
       delayBuffers: false,
       initialDataIndex: 0,
@@ -559,7 +559,7 @@ _.extend(Carousel.prototype, {
     .one(transitionEndEvent, this._transitionEnd)
     .css({
       transform: 'translate3d(' + this.current.x + 'px, 0, 0)',
-      transitionDuration: d + 's'
+      transitionDuration: (isBadAndroid ? 0 : d) + 's'
     });
     this.animating = true;
   },
