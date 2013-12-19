@@ -555,12 +555,21 @@ _.extend(Carousel.prototype, {
     this.next.page = Math.floor(-this.current.x / this.pageWidth) + this.pages.side;
     this.touches = [];
 
-    this.slider.off(transitionEndEvent)
-    .one(transitionEndEvent, this._transitionEnd)
-    .css({
+    this.slider.off(transitionEndEvent);
+
+    if (!isBadAndroid) {
+      this.slider.one(transitionEndEvent, this._transitionEnd);
+    }
+    else {
+      this.slider.off(transitionEndEvent);
+      _.delay(this._transitionEnd, 50);
+    }
+
+    this.slider.css({
       transform: 'translate3d(' + this.current.x + 'px, 0, 0)',
       transitionDuration: (isBadAndroid ? 0 : d) + 's'
     });
+
     this.animating = true;
   },
 
